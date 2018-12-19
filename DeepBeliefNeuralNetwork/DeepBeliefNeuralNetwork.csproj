@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A3E0F70D-595E-475A-A2C2-4DC753DD2ABF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DeepBeliefNeuralNetwork</RootNamespace>
+    <AssemblyName>DeepBeliefNeuralNetwork</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MathNet.Numerics, Version=3.19.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.3.19.0\lib\net40\MathNet.Numerics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Bilderstellen.cs" />
+    <Compile Include="BildLaden.cs" />
+    <Compile Include="BinaryForNetworkToLoad.cs" />
+    <Compile Include="DeepBeliefNetwork.cs" />
+    <Compile Include="MLPComponents\Funktionen\atan.cs" />
+    <Compile Include="MLPComponents\Funktionen\BentFunktion.cs" />
+    <Compile Include="MLPComponents\Funktionen\LineareFunktion.cs" />
+    <Compile Include="MLPComponents\Funktionen\LinearSättigungsFunktion.cs" />
+    <Compile Include="MLPComponents\Funktionen\ReLU.cs" />
+    <Compile Include="MLPComponents\Funktionen\ReLu6.cs" />
+    <Compile Include="MLPComponents\Funktionen\Sinus.cs" />
+    <Compile Include="MLPComponents\Funktionen\Softmax.cs" />
+    <Compile Include="MLPComponents\Funktionen\Softsign.cs" />
+    <Compile Include="MLPComponents\Funktionen\TanhReLu.cs" />
+    <Compile Include="MLPComponents\Funktionen\TestFunktion.cs" />
+    <Compile Include="MLPComponents\MLPCreateNeuralNetwork.cs" />
+    <Compile Include="MLPComponents\MLPWeightChange.cs" />
+    <Compile Include="MLPComponents\Funktionen\Rechteckfunktion.cs" />
+    <Compile Include="MLPComponents\Funktionen\Schwellwertfunktion.cs" />
+    <Compile Include="MLPComponents\Funktionen\SigmoideFunktion.cs" />
+    <Compile Include="MLPComponents\Funktionen\SoftplusFunktion.cs" />
+    <Compile Include="MLPComponents\Funktionen\TangensHyperbolikusFunktion.cs" />
+    <Compile Include="MLPComponents\IFunktionen.cs" />
+    <Compile Include="MLPComponents\MLPBackpropagationDelta.cs" />
+    <Compile Include="MLPComponents\MLPCalculateActivationAndOutput.cs" />
+    <Compile Include="MLPComponents\MLPNeuron.cs" />
+    <Compile Include="MLPComponents\MLPVectorCalculation.cs" />
+    <Compile Include="MLPComponents\MLPWeightMatrix.cs" />
+    <Compile Include="MLPwithoutTraining.cs" />
+    <Compile Include="MNISTConverter.cs" />
+    <Compile Include="MultiLayerPerceptron2.cs" />
+    <Compile Include="MultilayerPerceptron.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RBMComponents\RBMBiasNeuron.cs" />
+    <Compile Include="RBMComponents\RBMContrastiveDivergence.cs" />
+    <Compile Include="RBMComponents\RBMNeurons.cs" />
+    <Compile Include="RBMComponents\RBMWeightMatrix.cs" />
+    <Compile Include="RestrictedBoltzmannMachine.cs" />
+    <Compile Include="PatternToLearn.cs" />
+    <Compile Include="RestrictedBoltzmannMachine2.cs" />
+    <Compile Include="XavierInitialization.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
