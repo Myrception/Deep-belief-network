@@ -71,7 +71,7 @@ namespace DeepBeliefNeuralNetwork
 
         #endregion Constructor
 
-            #region Neuronal Network training
+        #region Neuronal Network training
 
             /// <summary>
             /// In dieser Methode wird das Neuronale Netz trainiert.

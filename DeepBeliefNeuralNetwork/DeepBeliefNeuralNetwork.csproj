@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BA_Import.cs" />
     <Compile Include="Bilderstellen.cs" />
     <Compile Include="BildLaden.cs" />
     <Compile Include="BinaryForNetworkToLoad.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="RestrictedBoltzmannMachine.cs" />
     <Compile Include="PatternToLearn.cs" />
     <Compile Include="RestrictedBoltzmannMachine2.cs" />
+    <Compile Include="TraficSignPictures_Import.cs" />
     <Compile Include="XavierInitialization.cs" />
   </ItemGroup>
   <ItemGroup>

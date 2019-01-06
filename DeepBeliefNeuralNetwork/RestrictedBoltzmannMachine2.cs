@@ -2,6 +2,7 @@
 using DeepBeliefNeuralNetwork.RBMComponents;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace DeepBeliefNeuralNetwork
 {
@@ -53,6 +54,98 @@ namespace DeepBeliefNeuralNetwork
             {
                 Layers[0][i].BinaryState = inputvector[i];
             }
+            /*
+            Parallel.For(0, Layers.Count - 1, i => 
+            {
+                temp2 += Layers[i].Count;
+                temp4 += Layers[i + 1].Count;
+                foreach (var hiddenNeuron in Layers[i + 1])//calculate hidden
+                {
+                    double sum = 0;
+
+                    for (int j = temp; j < temp2; j++)
+                    {
+                        sum += Layers[i][j - temp].BinaryState * Matrix[j, hiddenNeuron.Index];
+                    }
+
+                    double probability = 1d / (1d + Math.Exp(-(Bias[i].BiasHidden + sum)));
+                    hiddenNeuron.Probability = probability;
+                    hiddenNeuron.BinaryState = rnd.NextDouble() <= probability ? 1 : 0;
+                }
+                _initialBinaryHiddenList = new double[Layers[i + 1].Count];
+                for (int j = 0; j < Layers[i + 1].Count; j++)
+                {
+                    _initialBinaryHiddenList[j] = Layers[i + 1][j].Probability;
+                }
+                for (int cd = 0; cd < contrastiveDivergence; cd++)
+                {
+                    //Console.WriteLine("CD:" + cd);
+                    foreach (var visibleNeuron in Layers[i])//calculate reconstruction driven by Data
+                    {
+                        double sum = 0;
+                        for (int j = temp2; j < temp4; j++)
+                        {
+                            sum += Layers[i + 1][j - temp2].BinaryState * Matrix[j, visibleNeuron.Index];
+                        }
+                        double probability = 1d / (1d + Math.Exp(-(Bias[i].BiasVisible + sum)));
+                        visibleNeuron.Probability = probability;
+                        visibleNeuron.BinaryState = rnd.NextDouble() <= probability ? 1 : 0;
+                    }
+                    if (i == cd - 1)
+                    {
+                        foreach (var hiddenNeuron in Layers[i + 1])//calculate hidden with reconstructed Data for the last time
+                        {
+                            double sum = 0;
+
+                            for (int j = temp; j < temp2; j++)
+                            {
+                                sum += Layers[i][j - temp].Probability * Matrix[j, hiddenNeuron.Index];
+                            }
+                            double probability = 1d / (1d + Math.Exp(-(Bias[i].BiasHidden + sum)));
+                            hiddenNeuron.Probability = probability;
+                            hiddenNeuron.BinaryState = rnd.NextDouble() <= probability ? 1 : 0;
+                        }
+                    }
+                    else
+                    {
+                        foreach (var hiddenNeuron in Layers[i + 1])//calculate hidden with reconstructed Data
+                        {
+                            double sum = 0;
+
+                            for (int j = temp; j < temp2; j++)
+                            {
+                                sum += Layers[i][j - temp].BinaryState * Matrix[j, hiddenNeuron.Index];
+                            }
+                            double probability = 1d / (1d + Math.Exp(-(Bias[i].BiasHidden + sum)));
+                            hiddenNeuron.Probability = probability;
+                            hiddenNeuron.BinaryState = rnd.NextDouble() <= probability ? 1 : 0;
+                        }
+                    }
+                }
+                CalculateWeightMatrixAlteration(learningRate, inputvector, _initialBinaryHiddenList, Layers[i],
+                    Layers[i + 1], Bias[i]);
+                foreach (var hiddenNeuron in Layers[i + 1])//calculate hidden after weight alterration for the next layer
+                {
+                    double sum = 0;
+
+                    for (int j = temp; j < temp2; j++)
+                    {
+                        sum += Layers[i][j - temp].BinaryState * Matrix[j, hiddenNeuron.Index];
+                    }
+
+                    double probability = 1d / (1d + Math.Exp(-(Bias[i].BiasHidden + sum)));
+                    hiddenNeuron.Probability = probability;
+                    hiddenNeuron.BinaryState = rnd.NextDouble() <= probability ? 1 : 0;
+                }
+                inputvector = new double[Layers[i + 1].Count];
+                for (int j = 0; j < Layers[i + 1].Count; j++)
+                {
+                    inputvector[j] = Layers[i + 1][j].BinaryState;
+                }
+                temp += Layers[i].Count;
+            });
+            */
+            
             for (int i = 0; i < Layers.Count - 1; i++)
             {
                 temp2 += Layers[i].Count;

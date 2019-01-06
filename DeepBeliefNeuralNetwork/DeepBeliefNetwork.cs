@@ -10,7 +10,7 @@ namespace DeepBeliefNeuralNetwork
     {
         private List<RestrictedBoltzmannMachine> RBMLayer = new List<RestrictedBoltzmannMachine>();
         private List<MLPCreateNeuralNetwork> Test = new List<MLPCreateNeuralNetwork>();
-        private List<MLPCreateNeuralNetwork> Test2 = new List<MLPCreateNeuralNetwork>();
+        private List<MLPCreateNeuralNetwork> KNN = new List<MLPCreateNeuralNetwork>();
         private RestrictedBoltzmannMachine2 RBM2;
         private MultilayerPerceptron TestNetz;
         private MultiLayerPerceptron2 TestNetz2;
@@ -22,23 +22,20 @@ namespace DeepBeliefNeuralNetwork
         private bool MLP = false;// Variante 2
         private bool DBNN = false;// Variante 3
 
-        public DeepBeliefNetwork()
-        {
-            Test.Add(new MLPCreateNeuralNetwork { Neurons = 50, ActivationFunction = new LineareFunktion(), OutputFunction = new LineareFunktion() });
-            Test.Add(new MLPCreateNeuralNetwork { Neurons = 10, ActivationFunction = new SigmoideFunktion(), OutputFunction = new LineareFunktion() });
-            //Test.Add(new MLPCreateNeuralNetwork { Neurons = 222, ActivationFunction = new TangensHyperbolikusFunktion(), OutputFunction = new LineareFunktion() });
-            Test.Add(new MLPCreateNeuralNetwork { Neurons = 3, ActivationFunction = new SigmoideFunktion(), OutputFunction = new LineareFunktion() });
+        private string _lernregel;
 
-            Test2.Add(new MLPCreateNeuralNetwork { Neurons = 784, ActivationFunction = new LineareFunktion(), OutputFunction = new LineareFunktion() });
-            Test2.Add(new MLPCreateNeuralNetwork { Neurons = 50, ActivationFunction = new TangensHyperbolikusFunktion(), OutputFunction = new LineareFunktion() });
-            //Test2.Add(new MLPCreateNeuralNetwork { Neurons = 200, ActivationFunction = new TangensHyperbolikusFunktion(), OutputFunction = new LineareFunktion() });
-            Test2.Add(new MLPCreateNeuralNetwork { Neurons = 10, ActivationFunction = new TangensHyperbolikusFunktion(), OutputFunction = new LineareFunktion() });
-            Test2.Add(new MLPCreateNeuralNetwork { Neurons = 3, ActivationFunction = new TangensHyperbolikusFunktion(), OutputFunction = new LineareFunktion() });
-            //Test2.Add(new MLPCreateNeuralNetwork { Neurons = 3, ActivationFunction = new TangensHyperbolikusFunktion(), OutputFunction = new LineareFunktion() });
-            RBMLayerToCreate = new int[Test2.Count];
-            for (int i = 0; i < Test2.Count; i++)
+        public DeepBeliefNetwork(string lernregel)
+        {
+            _lernregel = lernregel;
+
+            KNN.Add(new MLPCreateNeuralNetwork { Neurons = 2304, ActivationFunction = new LineareFunktion(), OutputFunction = new LineareFunktion() });
+            KNN.Add(new MLPCreateNeuralNetwork { Neurons = 100, ActivationFunction = new TangensHyperbolikusFunktion(), OutputFunction = new LineareFunktion() });
+            KNN.Add(new MLPCreateNeuralNetwork { Neurons = 50, ActivationFunction = new TangensHyperbolikusFunktion(), OutputFunction = new LineareFunktion() });
+            KNN.Add(new MLPCreateNeuralNetwork { Neurons = 43, ActivationFunction = new TangensHyperbolikusFunktion(), OutputFunction = new LineareFunktion() });
+            RBMLayerToCreate = new int[KNN.Count];
+            for (int i = 0; i < KNN.Count; i++)
             {
-                RBMLayerToCreate[i] = Test2[i].Neurons;
+                RBMLayerToCreate[i] = KNN[i].Neurons;
             }
         }
 
@@ -52,47 +49,54 @@ namespace DeepBeliefNeuralNetwork
 
             if (RBM_MLP)
             {
-                string lernregel = "backprop"; //Eingabe ERS,ERS2 oder backprop
+                //string lernregel = "backprop"; //Eingabe ERS,ERS2 oder backprop
                 double RBMLearningRate = 0.1;
                 int contrastiveDivergence = 10000;
                 double MLPLearningRate = 0.1;
-                double MLPTolerance = 0.01; //0.01;
+                double MLPTolerance = 0.01;
                 int temp = 0;
 
                 Ordnerpfad = desktop + @"\" + OrdnerBachelorarbeit + @"\Berechnung\Mean0Variance2" + @"\" + @"CD" + contrastiveDivergence + @"\";
 
-                foreach (var item in Test2)
+                foreach (var item in KNN)
                 {
                     temp += item.Neurons;
                 }
                 double[,] weightmatrix = new double[temp, temp];
                 RBM2 = new RestrictedBoltzmannMachine2(RBMLayerToCreate, RND);
+                System.Threading.Tasks.Parallel.ForEach(trainigsSet, trainingCase =>
+                {
+                    var inputVector = (double[])trainingCase.inputvector.Clone();
+                    RBM2.GreedyTrainingRestrictedBoltzmannMachine(inputVector, contrastiveDivergence, RBMLearningRate, RND);
+                });
+                /*
                 foreach (var trainingCase in trainigsSet)
                 {
                     var inputVector = (double[])trainingCase.inputvector.Clone();
                     RBM2.GreedyTrainingRestrictedBoltzmannMachine(inputVector, contrastiveDivergence, RBMLearningRate, RND);
                 }
+                */
                 weightmatrix = RBM2.Matrix.Clone(RBM2.Matrix, weightmatrix);
-                TestNetz2 = new MultiLayerPerceptron2(Test2, weightmatrix, RND);
+                TestNetz2 = new MultiLayerPerceptron2(KNN, weightmatrix, RND);
 
                 string Time = DateTime.Now.ToString("dd.MM.yy_HHmmss");
                 string Networksize = "";
-                foreach (var Layer in Test2)
+                foreach (var Layer in KNN)
                 {
                     Networksize += Layer.Neurons + "_";
                 }
 
                 System.IO.TextWriter file = new System.IO.StreamWriter(Ordnerpfad + Networksize + Time + "Genauigkeit" + ".csv", true);//, true
 
-                file.Write(Test2[0].ActivationFunction.ToString() + ";" + Test2[1].ActivationFunction.ToString() + ";" + Test2[2].ActivationFunction.ToString() + ";" + Test2[3].ActivationFunction.ToString());
+                file.Write(KNN[0].ActivationFunction.ToString() + ";" + KNN[1].ActivationFunction.ToString() + ";" + KNN[2].ActivationFunction.ToString() + ";" + KNN[3].ActivationFunction.ToString());
                 file.WriteLine();
                 file.Write("RBM Lernrate" + ";" + RBMLearningRate + ";" + "Contrastive Divergence" + ";" + contrastiveDivergence + ";" + "MLP Lernrate" + ";" + MLPLearningRate + ";" + "MLP Toleranz" + ";" + MLPTolerance);
                 file.WriteLine();
-                file.Write("Lernregel" + ";" + lernregel + ";");
+                file.Write("Lernregel" + ";" + _lernregel + ";");
                 file.WriteLine();
                 file.Flush();
 
-                int schritte = TestNetz2.Training(10000, MLPLearningRate, MLPTolerance, trainigsSet, RBM2.Bias, testSet, lernregel, Ordnerpfad);
+                int schritte = TestNetz2.Training(10000, MLPLearningRate, MLPTolerance, trainigsSet, RBM2.Bias, testSet, _lernregel, Ordnerpfad);
                 double[] Vector = new double[trainigsSet[0].inputvector.Length];
                 double[] neu = new double[trainigsSet[0].targetvector.Length];
                 int numberOfCorrectClassification = 0;
@@ -490,17 +494,17 @@ namespace DeepBeliefNeuralNetwork
 
                 RBM2 = new RestrictedBoltzmannMachine2(RBMLayerToCreate, RND);
 
-                TestNetz2 = new MultiLayerPerceptron2(Test2, null, RND);
+                TestNetz2 = new MultiLayerPerceptron2(KNN, null, RND);
 
                 string Time = DateTime.Now.ToString("dd.MM.yy_HHmmss");
                 string Networksize = "";
-                foreach (var Layer in Test2)
+                foreach (var Layer in KNN)
                 {
                     Networksize += Layer.Neurons + "_";
                 }
                 System.IO.TextWriter file = new System.IO.StreamWriter(Ordnerpfad + Networksize + Time + "Genauigkeit" + ".csv", true);//, true
 
-                file.Write(Test2[0].ActivationFunction.ToString() + ";" + Test2[1].ActivationFunction.ToString() + ";" + Test2[2].ActivationFunction.ToString() + ";" + Test2[3].ActivationFunction.ToString());
+                file.Write(KNN[0].ActivationFunction.ToString() + ";" + KNN[1].ActivationFunction.ToString() + ";" + KNN[2].ActivationFunction.ToString() + ";" + KNN[3].ActivationFunction.ToString());
                 file.WriteLine();
                 file.Write(";" + "MLP Lernrate" + ";" + MLPLearningRate + ";" + "MLP Toleranz" + ";" + MLPTolerance);
                 file.WriteLine();

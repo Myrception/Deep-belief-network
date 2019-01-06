@@ -16,172 +16,13 @@ namespace DeepBeliefConsole
         private static void Main(string[] args)
         {
             string Desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            string OrdnerBachelorarbeit = "BachelorarbeitJoseph";
-            string Ordnerpfad = Desktop + @"\" + OrdnerBachelorarbeit;
-            string Trainingspfad = Ordnerpfad + @"\Noise\Training\Mean0Variance2";
-            string Testpfad = Ordnerpfad + @"\Noise\gaussian\Mean0Variance2";
+            string Trainingspfad = Desktop + @"\" + @"TraficSignPictures\train\GTSRB\Final_Training\Images";
+            string Testpfad = Desktop + @"\" + @"TraficSignPictures\test\GTSRB\Final_Test\Images";
 
             string Variance = Testpfad.Split(@"\\".ToCharArray())[Testpfad.Split(@"\\".ToCharArray()).Length - 1];
 
-            List<PatternToLearn> pattertolearn = new List<PatternToLearn>();
-            List<PatternToLearn> pattertotest = new List<PatternToLearn>();
-            List<PatternToLearn> bildpattertotest = new List<PatternToLearn>();
-
-            int targetCounter = 0;
-
-            var bilder = new BildLaden();
-            Bitmap bild;
-            foreach (var directories in Directory.EnumerateDirectories(Trainingspfad))
-            {
-                foreach (var file in Directory.EnumerateFiles(directories, "*b.bmp"))
-                {
-                    bild = bilder.LoadPicture(file);
-
-                    PatternToLearn muster = new PatternToLearn();
-                    muster.inputvector = new double[784];
-                    muster.targetvector = new double[3];
-                    int counter = 0;
-                    for (int i = 0; i < bild.Height; i++)
-                    {
-                        for (int j = 0; j < bild.Width; j++)
-                        {
-                            Color farbe = bild.GetPixel(i, j);
-                            if (farbe.R < 127 && farbe.G < 127 && farbe.B < 127)
-                            {
-                                muster.inputvector[counter] = 0;
-                            }
-                            else
-                            {
-                                muster.inputvector[counter] = 1;
-                            }
-                            counter++;
-                        }
-                    }
-                    muster.targetvector[targetCounter] = 1;
-                    pattertolearn.Add(muster);
-                }
-                foreach (var file in Directory.EnumerateFiles(directories, "*a.bmp"))
-                {
-                    bild = bilder.LoadPicture(file);
-
-                    PatternToLearn muster = new PatternToLearn();
-                    muster.inputvector = new double[784];
-                    muster.targetvector = new double[3];
-                    int counter = 0;
-                    for (int i = 0; i < bild.Height; i++)
-                    {
-                        for (int j = 0; j < bild.Width; j++)
-                        {
-                            Color farbe;
-                            farbe = bild.GetPixel(i, j);
-                            if (farbe.R < 127 && farbe.G < 127 && farbe.B < 127)
-                            {
-                                muster.inputvector[counter] = 0;
-                            }
-                            else
-                            {
-                                muster.inputvector[counter] = 1;
-                            }
-                            counter++;
-                        }
-                    }
-                    muster.targetvector[targetCounter] = 1;
-                    pattertolearn.Add(muster);
-                }
-                targetCounter++;
-            }
-
-            //bild = bilder.LoadPicture(@"C:\Users\Joseph\Desktop\Projekte\hitz\Pictures\Spiral1\0a.bmp");
-
-            //var amuster = new PatternToLearn
-            //{
-            //    inputvector = new double[784],
-            //    targetvector = new double[3]
-            //};
-            //int acounter = 0;
-            //for (int i = 0; i < bild.Height; i++)
-            //{
-            //    for (int j = 0; j < bild.Width; j++)
-            //    {
-            //        var farbe = bild.GetPixel(i, j);
-            //        if (farbe.R < 127 && farbe.G < 127 && farbe.B < 127)
-            //        {
-            //            amuster.inputvector[acounter] = 0;
-            //        }
-            //        else
-            //        {
-            //            amuster.inputvector[acounter] = 1;
-            //        }
-            //        acounter++;
-            //    }
-            //}
-            //bildpattertotest.Add(amuster);
-
-            targetCounter = 0;
-
-            foreach (var directories in Directory.EnumerateDirectories(Testpfad))
-            {
-                foreach (var file in Directory.EnumerateFiles(directories, "*b.bmp"))
-                {
-                    bild = bilder.LoadPicture(file);
-
-                    var muster = new PatternToLearn
-                    {
-                        inputvector = new double[784],
-                        targetvector = new double[3]
-                    };
-                    int counter = 0;
-                    for (int i = 0; i < bild.Height; i++)
-                    {
-                        for (int j = 0; j < bild.Width; j++)
-                        {
-                            var farbe = bild.GetPixel(i, j);
-                            if (farbe.R < 127 && farbe.G < 127 && farbe.B < 127)
-                            {
-                                muster.inputvector[counter] = 0;
-                            }
-                            else
-                            {
-                                muster.inputvector[counter] = 1;
-                            }
-                            counter++;
-                        }
-                    }
-                    muster.targetvector[targetCounter] = 1;
-                    pattertotest.Add(muster);
-                }
-                foreach (var file in Directory.EnumerateFiles(directories, "*a.bmp"))
-                {
-                    bild = bilder.LoadPicture(file);
-
-                    var muster = new PatternToLearn
-                    {
-                        inputvector = new double[784],
-                        targetvector = new double[3]
-                    };
-                    int counter = 0;
-                    for (int i = 0; i < bild.Height; i++)
-                    {
-                        for (int j = 0; j < bild.Width; j++)
-                        {
-                            var farbe = bild.GetPixel(i, j);
-                            if (farbe.R < 127 && farbe.G < 127 && farbe.B < 127)
-                            {
-                                muster.inputvector[counter] = 0;
-                            }
-                            else
-                            {
-                                muster.inputvector[counter] = 1;
-                            }
-                            counter++;
-                        }
-                    }
-                    muster.targetvector[targetCounter] = 1;
-                    pattertotest.Add(muster);
-                }
-                targetCounter++;
-            }
-
+            var test = new TraficSignPictures_Import();
+            var liste = test.Import(Trainingspfad,Testpfad);
             #region csv Import
 
             //string fileName = @"C:\Users\Joseph\Desktop\TrainingsMuster50.csv"; // Muss angepasst werden
@@ -319,40 +160,12 @@ namespace DeepBeliefConsole
 
             #endregion XOR Import
 
-            //foreach (var directories in Directory.EnumerateDirectories(Trainingspfad))
-            //{
-            //    foreach (var file in Directory.EnumerateFiles(directories, "*b.bmp"))
-            //string Matrix = @"C:\Users\Joseph\Desktop\Projekte\Bachelorarbeit\Variante 1\ERS\Tanh\CD1\784_50_10_3_08.07.17_201535Matrix.csv";
-            //string Matrix = args[0]; C:\Users\Joseph\Desktop\Projekte\Bachelorarbeit\Auswertung\Variante1\backprop\Tanh
-            //string noiseDirectoryName = noisedirectories.Split(@"\\".ToCharArray())[noisedirectories.Split(@"\\".ToCharArray()).Length-1];
-            //string matrixpfad = @"C:\Users\Joseph\Desktop\Projekte\Bachelorarbeit\Variante 2\ERS2\";
-            //string speicherpfad = @"C:\Users\Joseph\Desktop\Projekte\Bachelorarbeit\Auswertung\Variante2\ERS2\" + noiseDirectoryName;
-            //int matrixcounter = 0;
-            //int anzahlMatrizen = Directory.EnumerateFiles(matrixpfad, "*Matrix.csv").Count();
 
-            //foreach (var matrix in Directory.EnumerateFiles(matrixpfad, "*Matrix.csv"))
-            //{
-            //    string[] dateipfadsplitted = matrix.Split(@"\\".ToCharArray());
-            //    string dateipfadBinary = "";
-            //    for (int i = 0; i < dateipfadsplitted.Length - 1; i++)
-            //    {
-            //        dateipfadBinary += dateipfadsplitted[i] + @"\";
-            //    }
-            //    dateipfadBinary = dateipfadBinary + "Einstellungen.txt";
-
-            //    var binary = new BinaryForNetworkToLoad(dateipfadBinary);
-
-            //    MLPwithoutTraining auswertung = new MLPwithoutTraining(binary);
-            //    auswertung.ErstellenErgebniss(matrix, pattertotest, bildpattertotest, speicherpfad);
-
-            //    matrixcounter++;
-            //    Console.WriteLine(matrixcounter + "/" + anzahlMatrizen);
-            //}
 
             for (int i = 0; i < 5; i++)
             {
-                DeepBeliefNetwork DBNN = new DeepBeliefNetwork();
-                DBNN.GreedyLayerWiseTraining(pattertolearn, pattertotest, bildpattertotest, Variance);
+                DeepBeliefNetwork DBNN = new DeepBeliefNetwork("backprop");
+                DBNN.GreedyLayerWiseTraining(liste[0], liste[1], null, null);
             }
 
             //for (int i = 0; i < 30; i++)
