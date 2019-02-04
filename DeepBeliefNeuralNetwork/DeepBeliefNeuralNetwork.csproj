@@ -86,6 +86,7 @@
     <Compile Include="RestrictedBoltzmannMachine.cs" />
     <Compile Include="PatternToLearn.cs" />
     <Compile Include="RestrictedBoltzmannMachine2.cs" />
+    <Compile Include="ThreadSafeRandom.cs" />
     <Compile Include="TraficSignPictures_Import.cs" />
     <Compile Include="XavierInitialization.cs" />
   </ItemGroup>

@@ -1,9 +1,6 @@
 ﻿using DeepBeliefNeuralNetwork;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
 
 namespace DeepBeliefConsole
 {
@@ -19,10 +16,11 @@ namespace DeepBeliefConsole
             string Trainingspfad = Desktop + @"\" + @"TraficSignPictures\train\GTSRB\Final_Training\Images";
             string Testpfad = Desktop + @"\" + @"TraficSignPictures\test\GTSRB\Final_Test\Images";
 
-            string Variance = Testpfad.Split(@"\\".ToCharArray())[Testpfad.Split(@"\\".ToCharArray()).Length - 1];
+            //string Variance = Testpfad.Split(@"\\".ToCharArray())[Testpfad.Split(@"\\".ToCharArray()).Length - 1];
 
             var test = new TraficSignPictures_Import();
             var liste = test.Import(Trainingspfad,Testpfad);
+
             #region csv Import
 
             //string fileName = @"C:\Users\Joseph\Desktop\TrainingsMuster50.csv"; // Muss angepasst werden
@@ -146,26 +144,25 @@ namespace DeepBeliefConsole
 
             #region XOR Import
 
-            //List<PatternToLearn> XORpattertolearn = new List<PatternToLearn>();
-            //List<PatternToLearn> XORpattertotest = new List<PatternToLearn>();
-            //List<PatternToLearn> XORbildpattertotest = new List<PatternToLearn>();
+            List<PatternToLearn> XORpattertolearn = new List<PatternToLearn>();
+            List<PatternToLearn> XORpattertotest = new List<PatternToLearn>();
+            List<PatternToLearn> XORbildpattertotest = new List<PatternToLearn>();
 
-            //XORpattertolearn.Add(new PatternToLearn() {inputvector = new double[2] {0d, 0d}, targetvector = new double[1] {0d}});
-            //XORpattertolearn.Add(new PatternToLearn() { inputvector = new double[2] { 1d, 0d }, targetvector = new double[1] { 1d } });
-            //XORpattertolearn.Add(new PatternToLearn() { inputvector = new double[2] { 0d, 1d }, targetvector = new double[1] { 1d } });
-            //XORpattertolearn.Add(new PatternToLearn() { inputvector = new double[2] { 1d, 1d }, targetvector = new double[1] { 0d } });
+            XORpattertolearn.Add(new PatternToLearn() { inputvector = new double[2] { 0d, 0d }, targetvector = new double[1] { 0d } });
+            XORpattertolearn.Add(new PatternToLearn() { inputvector = new double[2] { 1d, 0d }, targetvector = new double[1] { 1d } });
+            XORpattertolearn.Add(new PatternToLearn() { inputvector = new double[2] { 0d, 1d }, targetvector = new double[1] { 1d } });
+            XORpattertolearn.Add(new PatternToLearn() { inputvector = new double[2] { 1d, 1d }, targetvector = new double[1] { 0d } });
 
-            //XORpattertotest = XORpattertolearn;
-            //XORbildpattertotest.Add(new PatternToLearn() { inputvector = new double[2] { 1d, 0d }, targetvector = new double[1] { 1d } });
+            XORpattertotest = XORpattertolearn;
+            XORbildpattertotest.Add(new PatternToLearn() { inputvector = new double[2] { 1d, 0d }, targetvector = new double[1] { 1d } });
 
             #endregion XOR Import
 
-
-
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 1; i++)
             {
                 DeepBeliefNetwork DBNN = new DeepBeliefNetwork("backprop");
                 DBNN.GreedyLayerWiseTraining(liste[0], liste[1], null, null);
+                //DBNN.GreedyLayerWiseTraining(XORpattertolearn, XORpattertotest, null, null);
             }
 
             //for (int i = 0; i < 30; i++)
