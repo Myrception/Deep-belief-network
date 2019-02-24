@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using DeepBeliefNeuralNetwork.MLPComponents;
+﻿using DeepBeliefNeuralNetwork.MLPComponents;
 using DeepBeliefNeuralNetwork.MLPComponents.Funktionen;
 using DeepBeliefNeuralNetwork.RBMComponents;
+using System;
+using System.Collections.Generic;
 
 namespace DeepBeliefNeuralNetwork
 {
@@ -19,7 +19,8 @@ namespace DeepBeliefNeuralNetwork
         /// <summary>
         /// Im Konstruktor wird die Gewichtsmatrix mit der nötigen Größe initialisiert. Sowie die
         /// Eingabeneuronen und Ausgabeneuronen erstellt. Danach wird die Matrix noch an den Verbindungsstellen
-        /// mit Random werten belegt.
+        /// mit
+        /// werten belegt.
         /// </summary>
         /// <param name="networkToBeCreate">Enthält alle Parameter die zur erstellung des Neuronalen Netzes notwendig sind</param>
         public MultilayerPerceptron(List<MLPCreateNeuralNetwork> networkToBeCreate)
@@ -53,7 +54,7 @@ namespace DeepBeliefNeuralNetwork
         /// <param name="learningToleranz">Legt dei Toleranz mit der gelernt werden soll fest</param>
         /// <param name="patternToLearn">Enthalten die Trainingsmuster</param>
         /// <returns></returns>
-        internal int Training(int maxLearningSteps, double learningRate, double learningToleranz, List<PatternToLearn> patternToLearn, List<PatternToLearn> patternToTest, List<RestrictedBoltzmannMachine> RBMLayer,Random RND)
+        internal int Training(int maxLearningSteps, double learningRate, double learningToleranz, List<PatternToLearn> patternToLearn, List<PatternToLearn> patternToTest, List<RestrictedBoltzmannMachine> RBMLayer, ThreadSafeRandom RND)
         {
             string time = DateTime.Now.ToString("dd.MM.yy_HHmmss");
             string networksize = "";
@@ -65,7 +66,6 @@ namespace DeepBeliefNeuralNetwork
             }
             while (steps < maxLearningSteps)
             {
-
                 Fehler = 0;
                 decimal fehlerTest = 0;
                 foreach (var muster in patternToLearn)
@@ -126,7 +126,6 @@ namespace DeepBeliefNeuralNetwork
                     }
                     patter.RBMOutput = (double[])inputVector.Clone();
 
-
                     double[] pruefung = new double[patter.targetvector.Length];
                     double[] ausgabevektor = new double[patter.targetvector.Length];
                     ausgabevektor = patter.RBMOutput.CalculateTarget(Layers, Matrix, 1d);
@@ -149,7 +148,7 @@ namespace DeepBeliefNeuralNetwork
                 }
                 Console.WriteLine("Trainingserror:" + " " + Fehler);
                 Console.WriteLine("Testerror:" + " " + fehlerTest);
-                
+
                 if (trainingErfolgt)
                 {
                     Console.WriteLine(steps);
@@ -159,11 +158,9 @@ namespace DeepBeliefNeuralNetwork
                 else
                 {
                     Console.WriteLine(Fehler);
-                    
-                    
-                        Matrix.Speichern(@"C:\Users\Joseph\Desktop\Matrix.csv", Matrix);
-                        return steps;
-                    
+
+                    Matrix.Speichern(@"C:\Users\Joseph\Desktop\Matrix.csv", Matrix);
+                    return steps;
                 }
             }
             //if (steps == maxLearningSteps)
@@ -197,25 +194,24 @@ namespace DeepBeliefNeuralNetwork
             for (int i = 0; i < Layers[Layers.Count - 1].Count; i++)
             {
                 pruefung[i] = muster.targetvector[i] - ausgabevektor[i];
-               
+
                 if (double.IsNaN(pruefung[i]))
                 {
-                    
                 }
                 double outputDelta;
                 if (Layers[Layers.Count - 1][i].ActivationFunction is Softmax)
                 {
-                   outputDelta = Layers[Layers.Count - 1][i].ActivationFunction.BerechneAbleitung(Layers[Layers.Count - 1][i].NetInput, 1d,Layers)
-                     * (muster.targetvector[i] - Layers[Layers.Count - 1][i].Output);
-                    if (double.IsNaN(outputDelta)||double.IsInfinity(outputDelta))
+                    outputDelta = Layers[Layers.Count - 1][i].ActivationFunction.BerechneAbleitung(Layers[Layers.Count - 1][i].NetInput, 1d, Layers)
+                      * (muster.targetvector[i] - Layers[Layers.Count - 1][i].Output);
+                    if (double.IsNaN(outputDelta) || double.IsInfinity(outputDelta))
                     {
                         nochmaltrainig = false;
                     }
                 }
                 else
-                {    
-                outputDelta = Layers[Layers.Count - 1][i].ActivationFunction.BerechneAbleitung(Layers[Layers.Count - 1][i].NetInput, 1d)
-                    * (muster.targetvector[i] - Layers[Layers.Count - 1][i].Output);
+                {
+                    outputDelta = Layers[Layers.Count - 1][i].ActivationFunction.BerechneAbleitung(Layers[Layers.Count - 1][i].NetInput, 1d)
+                        * (muster.targetvector[i] - Layers[Layers.Count - 1][i].Output);
                 }
                 if (double.IsNaN(outputDelta))
                 {
@@ -268,8 +264,7 @@ namespace DeepBeliefNeuralNetwork
                     }
                     else
                     {
-                        
-                    temp *= Layers[i][j - Layers[i][0].Index].ActivationFunction.BerechneAbleitung(Layers[i][j - Layers[i][0].Index].NetInput, 1d);
+                        temp *= Layers[i][j - Layers[i][0].Index].ActivationFunction.BerechneAbleitung(Layers[i][j - Layers[i][0].Index].NetInput, 1d);
                     }
                     foreach (MLPNeuron neuronenOutput in Layers[i - 1])
                     {
@@ -308,6 +303,7 @@ namespace DeepBeliefNeuralNetwork
         }
 
         #region ERS Training
+
         private bool TrainiereMusterERS(double lernrate, double lerntoleranz, PatternToLearn muster)
         {
             bool nochmaltrainig = false;
@@ -323,7 +319,6 @@ namespace DeepBeliefNeuralNetwork
 
                 if (double.IsNaN(pruefung[i]))
                 {
-
                 }
                 double outputDelta;
                 //if (Layers[Layers.Count - 1][i].ActivationFunction is Softmax)
@@ -358,7 +353,6 @@ namespace DeepBeliefNeuralNetwork
                         änderungen.Add(änderung);
                         if (lernrate * Math.Abs(1 - Math.Abs(Matrix[neuronenOutput.Index, Layers[Layers.Count - 1][i].Index])) * outputDelta * Math.Sign(neuronenOutput.Output) > 100d)
                         {
-
                         }
                     }
                     backDelta.Add(new MLPBackpropagationDelta() { Index = Layers[Layers.Count - 1][i].Index, Delta = outputDelta });
@@ -396,7 +390,6 @@ namespace DeepBeliefNeuralNetwork
                     //}
                     //else
                     //{
-
                     //    temp = temp * Layers[i][j - Layers[i][0].Index].ActivationFunction.BerechneAbleitung(Layers[i][j - Layers[i][0].Index].NetInput, 1d);
                     //}
                     foreach (MLPNeuron neuronenOutput in Layers[i - 1])
@@ -410,7 +403,6 @@ namespace DeepBeliefNeuralNetwork
                         änderungen.Add(änderung);
                         if (lernrate * Math.Abs(1 - Math.Abs(Matrix[neuronenOutput.Index, j])) * temp * Math.Sign(neuronenOutput.Output) > 100d)
                         {
-
                         }
                     }
                     backDelta.Add(new MLPBackpropagationDelta() { Index = j, Delta = temp });
@@ -454,11 +446,11 @@ namespace DeepBeliefNeuralNetwork
             }
             if (nochmaltrainig == false)
             {
-
             }
             return nochmaltrainig;
         }
-        #endregion
+
+        #endregion ERS Training
 
         #endregion Neuronal Network training
 
@@ -471,7 +463,7 @@ namespace DeepBeliefNeuralNetwork
                 {
                     foreach (MLPNeuron layerNPlusOne in Layers[i + 1])
                     {
-                        Matrix[layerN.Index, layerNPlusOne.Index] = 2*(rnd.NextDouble()-0.5);
+                        Matrix[layerN.Index, layerNPlusOne.Index] = 2 * (rnd.NextDouble() - 0.5);
                     }
                 }
             }

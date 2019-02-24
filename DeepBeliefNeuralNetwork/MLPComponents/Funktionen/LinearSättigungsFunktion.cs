@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using DeepBeliefNeuralNetwork.MLPComponents;
 
 namespace DeepBeliefNeuralNetwork.MLPComponents.Funktionen
 {/// <summary>

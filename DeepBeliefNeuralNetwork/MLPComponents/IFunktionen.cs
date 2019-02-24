@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace DeepBeliefNeuralNetwork.MLPComponents
 {
@@ -11,6 +7,7 @@ namespace DeepBeliefNeuralNetwork.MLPComponents
         double BerechneWert(double input, double alpha);
 
         double BerechneAbleitung(double input, double alpha);
+
         double BerechneAbleitung(double input, double alpha, List<List<MLPNeuron>> layers);
     }
 }

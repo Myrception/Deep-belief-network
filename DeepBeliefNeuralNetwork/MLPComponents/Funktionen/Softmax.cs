@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DeepBeliefNeuralNetwork.MLPComponents.Funktionen
 {
@@ -17,7 +14,8 @@ namespace DeepBeliefNeuralNetwork.MLPComponents.Funktionen
         {
             throw new NotImplementedException();
         }
-        public double BerechneAbleitung(double input, double alpha, List<List<MLPNeuron>>layer)
+
+        public double BerechneAbleitung(double input, double alpha, List<List<MLPNeuron>> layer)
         {
             double sumOfAlNetInput = 0, output = 0;
             foreach (var mlpNeuron in layer[layer.Count - 1])

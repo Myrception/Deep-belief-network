@@ -2,7 +2,6 @@
 using DeepBeliefNeuralNetwork.RBMComponents;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace DeepBeliefNeuralNetwork
 {
@@ -12,9 +11,9 @@ namespace DeepBeliefNeuralNetwork
         public List<RBMBiasNeuron> Bias = new List<RBMBiasNeuron>();
         public RBMWeightMatrix Matrix { get; set; }
 
-        private int _weightTemp1 = 0, _weightTemp2 = 0; //Hilfsvariablen zur Bestimmung der Richtigen Positionen der Gewichtsänderungen
+        //private int _weightTemp1 = 0, _weightTemp2 = 0; //Hilfsvariablen zur Bestimmung der Richtigen Positionen der Gewichtsänderungen
 
-        public RestrictedBoltzmannMachine2(int[] neurons, Random RND)
+        public RestrictedBoltzmannMachine2(int[] neurons, ThreadSafeRandom RND)
         {
             int index = 0, count = 0;
             //int numToRemove = 10;
@@ -44,18 +43,18 @@ namespace DeepBeliefNeuralNetwork
             WeightMatrixRandom(neuron, RND);
         }
 
-        public void GreedyTrainingRestrictedBoltzmannMachine(double[] inputvector, int contrastiveDivergence, double learningRate, Random rnd)
+        public void GreedyTrainingRestrictedBoltzmannMachine(double[] inputvector, int contrastiveDivergence, double learningRate, ThreadSafeRandom rnd)
         {
             int temp = 0, temp2 = 0, temp4 = Layers[0].Count; // temp3=0,
-            _weightTemp1 = 0;
-            _weightTemp2 = 0;
+            int _weightTemp1 = 0;
+            int _weightTemp2 = 0;
             double[] _initialBinaryHiddenList = new double[0];
             for (int i = 0; i < inputvector.Length; i++)
             {
                 Layers[0][i].BinaryState = inputvector[i];
             }
             /*
-            Parallel.For(0, Layers.Count - 1, i => 
+            Parallel.For(0, Layers.Count - 1, i =>
             {
                 temp2 += Layers[i].Count;
                 temp4 += Layers[i + 1].Count;
@@ -145,7 +144,7 @@ namespace DeepBeliefNeuralNetwork
                 temp += Layers[i].Count;
             });
             */
-            
+
             for (int i = 0; i < Layers.Count - 1; i++)
             {
                 temp2 += Layers[i].Count;
@@ -215,7 +214,7 @@ namespace DeepBeliefNeuralNetwork
                     }
                 }
                 CalculateWeightMatrixAlteration(learningRate, inputvector, _initialBinaryHiddenList, Layers[i],
-                    Layers[i + 1], Bias[i]);
+                    Layers[i + 1], Bias[i], _weightTemp1, _weightTemp2);
                 foreach (var hiddenNeuron in Layers[i + 1])//calculate hidden after weight alterration for the next layer
                 {
                     double sum = 0;
@@ -238,7 +237,7 @@ namespace DeepBeliefNeuralNetwork
             }
         }
 
-        public void CalculateWeightMatrixAlteration(double learningRate, double[] inputvector, double[] initialBinaryHiddenList, List<RBMNeurons> actualVisible, List<RBMNeurons> actualHidden, RBMBiasNeuron actualBias)
+        public void CalculateWeightMatrixAlteration(double learningRate, double[] inputvector, double[] initialBinaryHiddenList, List<RBMNeurons> actualVisible, List<RBMNeurons> actualHidden, RBMBiasNeuron actualBias, int _weightTemp1, int _weightTemp2)
         {
             _weightTemp2 += actualVisible.Count;
             for (int i = 0; i < actualVisible.Count; i++) // Update weightmatrix
@@ -250,7 +249,7 @@ namespace DeepBeliefNeuralNetwork
                                                          initialBinaryHiddenList[j - _weightTemp2]) -
                                                         (actualVisible[i].BinaryState *
                                                          actualHidden[j - _weightTemp2].Probability)));
-                    Matrix[j, i + _weightTemp1] = Matrix[i + _weightTemp1, j];
+                    //Matrix[j, i + _weightTemp1] = Matrix[i + _weightTemp1, j];
                 }
             }
             _weightTemp1 += actualVisible.Count;
@@ -269,12 +268,12 @@ namespace DeepBeliefNeuralNetwork
             //}
         }
 
-        public void GreedyTrainingRestrictedBoltzmannMachineWithPicture(double[] inputvector, double learningRate, Random rnd)
+        public void GreedyTrainingRestrictedBoltzmannMachineWithPicture(double[] inputvector, double learningRate, ThreadSafeRandom rnd)
         {
             Bilderstellen bild;
             int temp = 0, temp2 = 0, temp3 = 0, temp4 = Layers[0].Count;
-            _weightTemp1 = 0;
-            _weightTemp2 = 0;
+            int _weightTemp1 = 0;
+            int _weightTemp2 = 0;
             double[] _initialBinaryHiddenList = new double[0];
             for (int i = 0; i < inputvector.Length; i++)
             {
@@ -410,7 +409,7 @@ namespace DeepBeliefNeuralNetwork
             }
         }
 
-        private void WeightMatrixRandom(int[] Neurons, Random RND)
+        private void WeightMatrixRandom(int[] Neurons, ThreadSafeRandom RND)
         {
             int temp = 0, temp2 = 0;
             IFunktionen Funktion = new MLPComponents.Funktionen.SigmoideFunktion();

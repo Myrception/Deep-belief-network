@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DeepBeliefNeuralNetwork
+﻿namespace DeepBeliefNeuralNetwork
 {
     /// <summary>
     /// Klasse zur Erstellung der Muster die gelernt werden sollen.
     /// </summary>
     public class PatternToLearn
     {
-
-
         private double[] _inputvector;
 
         public double[] inputvector
@@ -36,6 +28,7 @@ namespace DeepBeliefNeuralNetwork
             get { return _probabilitie; }
             set { _probabilitie = value; }
         }
+
         private double[] _RBMOutput;
 
         public double[] RBMOutput

@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DeepBeliefNeuralNetwork.MLPComponents.Funktionen
 {
-    class ReLu6 : IFunktionen
+    internal class ReLu6 : IFunktionen
     {
         public double BerechneWert(double input, double alpha)
         {

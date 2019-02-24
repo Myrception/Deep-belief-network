@@ -15,7 +15,7 @@ namespace DeepBeliefNeuralNetwork
             List<PatternToLearn> pattertotest = new List<PatternToLearn>();
 
             var bilder = new BildLaden();
-            System.Threading.Tasks.Parallel.ForEach(Directory.EnumerateDirectories(Trainingspfad), directories => 
+            System.Threading.Tasks.Parallel.ForEach(Directory.EnumerateDirectories(Trainingspfad), directories =>
             {
                 foreach (var file in Directory.EnumerateFiles(directories, "*.jpg"))
                 {
@@ -43,7 +43,8 @@ namespace DeepBeliefNeuralNetwork
                         }
                     }
                     muster.targetvector[Int32.Parse(splitdirectories)] = 1;
-                    if(muster is null) {
+                    if (muster is null)
+                    {
                         Console.WriteLine("test");
                     }
                     pattertolearn.Add(muster);
@@ -51,12 +52,12 @@ namespace DeepBeliefNeuralNetwork
             }
             );
 
-            StreamReader reader = new StreamReader(Testpfad + @"\" +@"GT-final_test.csv");
+            StreamReader reader = new StreamReader(Testpfad + @"\" + @"GT-final_test.csv");
             string line;
             string[] splitted;
             char[] separator = ";".ToCharArray();
             List<string[]> compareList = new List<string[]>();
-            
+
             while (!reader.EndOfStream)
             {
                 string[] compareString = new string[2];

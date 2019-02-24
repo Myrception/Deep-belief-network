@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DeepBeliefNeuralNetwork.MLPComponents;
+﻿using DeepBeliefNeuralNetwork.MLPComponents;
+using System;
 
 namespace DeepBeliefNeuralNetwork
 {
     /// <summary>
     /// Scheinbar fehlerhaft ?!
     /// </summary>
-    class XavierInitialization
+    internal class XavierInitialization
     {
         private readonly double _stdDev = 1.0;
+
         public XavierInitialization(int fan_in, int fan_out, IFunktionen AktivierungsfunktionDesLayers)
         {
             if (AktivierungsfunktionDesLayers is MLPComponents.Funktionen.SigmoideFunktion)
@@ -31,6 +28,7 @@ namespace DeepBeliefNeuralNetwork
                 _stdDev = temp * temp;
             }
         }
+
         /// <summary>
         /// Wahrscheinlichkeitsverteilung wird über die Box-Muller-Methode erstellt
         /// </summary>

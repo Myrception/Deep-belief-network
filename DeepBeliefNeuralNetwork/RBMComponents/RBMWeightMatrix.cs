@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DeepBeliefNeuralNetwork.RBMComponents
+﻿namespace DeepBeliefNeuralNetwork.RBMComponents
 {
     internal class RBMWeightMatrix
     {
@@ -13,6 +7,7 @@ namespace DeepBeliefNeuralNetwork.RBMComponents
         public int Coloumn { get; set; }
 
         private double[,] _matrix;
+
         /// <summary>
         /// x = row y = Coloumn
         /// </summary>
@@ -25,6 +20,7 @@ namespace DeepBeliefNeuralNetwork.RBMComponents
 
             set { _matrix[x, y] = value; }
         }
+
         public void Speichern(string SpeicherortSowieDateiname, RBMWeightMatrix matrix)
         {
             using (System.IO.TextWriter file =
@@ -41,6 +37,7 @@ namespace DeepBeliefNeuralNetwork.RBMComponents
                 file.Flush();
             }
         }
+
         public double[,] Clone(RBMWeightMatrix Selber, double[,] Clone)
         {
             double[,] temp = new double[Selber.Row, Selber.Coloumn];

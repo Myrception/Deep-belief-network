@@ -1,21 +1,17 @@
 ﻿using DeepBeliefNeuralNetwork.MLPComponents;
-using DeepBeliefNeuralNetwork.MLPComponents.Funktionen;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DeepBeliefNeuralNetwork
 {
     public class MLPwithoutTraining
     {
-        List<RestrictedBoltzmannMachine> RBMLayer = new List<RestrictedBoltzmannMachine>();
-        List<MLPCreateNeuralNetwork> Test2 = new List<MLPCreateNeuralNetwork>();
-        RestrictedBoltzmannMachine2 RBM2;
-        MultiLayerPerceptron2 TestNetz2;
-        Random RND = new Random();
-        int[] RBMLayerToCreate;
+        private List<RestrictedBoltzmannMachine> RBMLayer = new List<RestrictedBoltzmannMachine>();
+        private List<MLPCreateNeuralNetwork> Test2 = new List<MLPCreateNeuralNetwork>();
+        private RestrictedBoltzmannMachine2 RBM2;
+        private MultiLayerPerceptron2 TestNetz2;
+        private ThreadSafeRandom RND = new ThreadSafeRandom();
+        private int[] RBMLayerToCreate;
 
         public MLPwithoutTraining(BinaryForNetworkToLoad Binary)
         {
@@ -34,9 +30,7 @@ namespace DeepBeliefNeuralNetwork
             {
                 RBMLayerToCreate[i] = Test2[i].Neurons;
             }
-
         }
-
 
         public void ErstellenErgebniss(string Matrixpfad, List<PatternToLearn> testSet, List<PatternToLearn> bildSet, string speicherpfad)
         {
@@ -47,7 +41,6 @@ namespace DeepBeliefNeuralNetwork
             //double MLPTolerance = 0.01;
             int temp = 0;
 
-
             foreach (var item in Test2)
             {
                 temp += item.Neurons;
@@ -57,7 +50,6 @@ namespace DeepBeliefNeuralNetwork
 
             weightmatrix = RBM2.Matrix.Clone(RBM2.Matrix, weightmatrix);
             TestNetz2 = new MultiLayerPerceptron2(Test2, Matrixpfad);
-
 
             string Time = DateTime.Now.ToString("dd.MM.yy_HHmmss");
             string Networksize = "";
@@ -197,12 +189,10 @@ namespace DeepBeliefNeuralNetwork
                         bild.BildPixelPlazieren(i, j, System.Drawing.Color.White);
                     }
 
-
                     if (neu[1] > neu[0] && neu[1] > neu[2]) // ist Spirale 1 Farbe Blau
                     {
                         bild.BildPixelPlazieren(i, j, System.Drawing.Color.Blue);
                     }
-
 
                     if (neu[2] > neu[1] && neu[2] > neu[0]) // ist Spirale 2 Farbe Rot
                     {
@@ -210,14 +200,11 @@ namespace DeepBeliefNeuralNetwork
                     }
                     TestVector[counter] = 0;
                     counter++;
-
                 }
                 bild.SavePicture(speicherpfad + @"\" + Networksize + Time + "Bild" + ".png");
                 Vector = bildSet[0].inputvector;
                 //RBM2.GreedyTrainingRestrictedBoltzmannMachineWithPicture(Vector, RBMLearningRate, RND);
             }
-
         }
-
     }
 }

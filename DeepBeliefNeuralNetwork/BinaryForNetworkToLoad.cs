@@ -1,13 +1,9 @@
 ﻿using DeepBeliefNeuralNetwork.MLPComponents;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DeepBeliefNeuralNetwork
 {
-     public class BinaryForNetworkToLoad
+    public class BinaryForNetworkToLoad
     {
         public BinaryForNetworkToLoad(string DateipfadBinary)
         {
@@ -49,7 +45,6 @@ namespace DeepBeliefNeuralNetwork
             _outputFunktion = outFu;
         }
 
-
         private int _anzahlLayer;
 
         public int AnzahlLayer
@@ -57,7 +52,6 @@ namespace DeepBeliefNeuralNetwork
             get { return _anzahlLayer; }
             set { _anzahlLayer = value; }
         }
-
 
         private int[] _neuronsPerLayer;
 
@@ -67,7 +61,6 @@ namespace DeepBeliefNeuralNetwork
             set { _neuronsPerLayer = value; }
         }
 
-
         private IFunktionen[] _aktivierungsFunktion;
 
         public IFunktionen[] AktivierungsFunktion
@@ -75,7 +68,6 @@ namespace DeepBeliefNeuralNetwork
             get { return _aktivierungsFunktion; }
             set { _aktivierungsFunktion = value; }
         }
-
 
         private IFunktionen[] _outputFunktion;
 

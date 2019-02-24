@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DeepBeliefNeuralNetwork.MLPComponents.Funktionen
 {
-    class Softsign: IFunktionen
+    internal class Softsign : IFunktionen
     {
         public double BerechneWert(double input, double alpha)
         {

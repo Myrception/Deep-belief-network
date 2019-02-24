@@ -1,9 +1,6 @@
-﻿using System;
+﻿using DeepBeliefNeuralNetwork.MLPComponents.Funktionen;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DeepBeliefNeuralNetwork.MLPComponents.Funktionen;
 
 namespace DeepBeliefNeuralNetwork.MLPComponents
 {
@@ -17,7 +14,7 @@ namespace DeepBeliefNeuralNetwork.MLPComponents
         /// <param name="matrix">Die Gewichtsmatrix</param>
         /// <param name="alpha">Ein Term in den Funktionen womit diese beinflusst werden können</param>
         /// <returns></returns>
-        internal static double[] CalculateTarget(this double[] inputvector, List<List<MLPNeuron>> layers, MLPWeightMatrix matrix ,double alpha)
+        internal static double[] CalculateTarget(this double[] inputvector, List<List<MLPNeuron>> layers, MLPWeightMatrix matrix, double alpha)
         {
             bool softmaxusingoutput = false, softmaxusingactivation = false;
             double SumForSoftmaxClassifier = 0;
@@ -39,7 +36,6 @@ namespace DeepBeliefNeuralNetwork.MLPComponents
                         layers[0][k].NetInput = inputvector[k];
 
                         layers[0][k].Calculate(alpha);
-
                     }
                 }
                 else // the other Layers
@@ -59,7 +55,6 @@ namespace DeepBeliefNeuralNetwork.MLPComponents
                             }
                             if (double.IsNaN(layerN.NetInput))
                             {
-                                
                             }
                         }
                         layerN.Calculate(alpha);
@@ -75,17 +70,15 @@ namespace DeepBeliefNeuralNetwork.MLPComponents
                         {
                             SumForSoftmaxClassifier += Math.Exp(layerN.NetInput);
                         }
-
                     }
-                    if (softmaxusingoutput) 
+                    if (softmaxusingoutput)
                     {
-                    foreach (MLPNeuron layerN in layers[i])
+                        foreach (MLPNeuron layerN in layers[i])
                         {
-                        //layerN.calculate(alpha);
+                            //layerN.calculate(alpha);
                             layerN.Output = layerN.Output / SumForSoftmaxClassifier;
                             if (double.IsNaN(layerN.Output))
                             {
-                                
                             }
                         }
                     }
@@ -97,7 +90,6 @@ namespace DeepBeliefNeuralNetwork.MLPComponents
                             layerN.Output = layerN.Output / SumForSoftmaxClassifier;
                             if (double.IsNaN(layerN.Output))
                             {
-
                             }
                         }
                     }
@@ -110,6 +102,7 @@ namespace DeepBeliefNeuralNetwork.MLPComponents
             }
             return outputVector;
         }
+
         /// <summary>
         /// Methode zur Berechnung der Ausgabe des Neuronalen Netzwerkes mit Bias
         /// </summary>
@@ -143,9 +136,7 @@ namespace DeepBeliefNeuralNetwork.MLPComponents
                         layers[0][k].Calculate(alpha);
                         if (double.IsNaN(layers[0][k].NetInput))
                         {
-
                         }
-
                     }
                 }
                 else // the other Layers
@@ -154,18 +145,16 @@ namespace DeepBeliefNeuralNetwork.MLPComponents
                     {
                         foreach (MLPNeuron layerNMinusOne in layers[i - 1])
                         {
-                            if (i==layers.Count - 1)
+                            if (i == layers.Count - 1)
                             {
                                 layerN.NetInput += (layerNMinusOne.Output * matrix[layerNMinusOne.Index, layerN.Index]) + 0d;
                             }
                             else
                             {
-                                layerN.NetInput += (layerNMinusOne.Output * matrix[layerNMinusOne.Index, layerN.Index]) + RBMBias[i-1].BiasHidden;
-                               
+                                layerN.NetInput += (layerNMinusOne.Output * matrix[layerNMinusOne.Index, layerN.Index]) + RBMBias[i - 1].BiasHidden;
                             }
                             if (double.IsNaN(layerN.NetInput))
                             {
-
                             }
                         }
 
@@ -182,7 +171,6 @@ namespace DeepBeliefNeuralNetwork.MLPComponents
                         {
                             SumForSoftmaxClassifier += Math.Exp(layerN.NetInput);
                         }
-
                     }
                     if (softmaxusingoutput)
                     {
@@ -192,7 +180,6 @@ namespace DeepBeliefNeuralNetwork.MLPComponents
                             layerN.Output = layerN.Output / SumForSoftmaxClassifier;
                             if (double.IsNaN(layerN.Output))
                             {
-
                             }
                         }
                     }
@@ -204,7 +191,6 @@ namespace DeepBeliefNeuralNetwork.MLPComponents
                             layerN.Output = layerN.Output / SumForSoftmaxClassifier;
                             if (double.IsNaN(layerN.Output))
                             {
-
                             }
                         }
                     }
@@ -216,7 +202,6 @@ namespace DeepBeliefNeuralNetwork.MLPComponents
                 j++;
                 if (double.IsNaN(outputLayer.Output))
                 {
-
                 }
             }
             return outputVector;

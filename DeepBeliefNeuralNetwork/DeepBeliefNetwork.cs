@@ -14,11 +14,15 @@ namespace DeepBeliefNeuralNetwork
         private RestrictedBoltzmannMachine2 RBM2;
         private MultilayerPerceptron TestNetz;
         private MultiLayerPerceptron2 TestNetz2;
-        private Random RND = new Random();
+
+        //private Random RND = new Random();
+        private ThreadSafeRandom RND = new ThreadSafeRandom();
+
         private int[] RBMLayerToCreate;
 
         //Auswahl mit welcher Methode gelernt werden soll
         private bool RBM_MLP = true;//Variante 1
+
         private bool MLP = false;// Variante 2
         private bool DBNN = false;// Variante 3
 
@@ -29,9 +33,15 @@ namespace DeepBeliefNeuralNetwork
             _lernregel = lernregel;
 
             KNN.Add(new MLPCreateNeuralNetwork { Neurons = 2304, ActivationFunction = new LineareFunktion(), OutputFunction = new LineareFunktion() });
-            KNN.Add(new MLPCreateNeuralNetwork { Neurons = 100, ActivationFunction = new TangensHyperbolikusFunktion(), OutputFunction = new LineareFunktion() });
-            KNN.Add(new MLPCreateNeuralNetwork { Neurons = 50, ActivationFunction = new TangensHyperbolikusFunktion(), OutputFunction = new LineareFunktion() });
-            KNN.Add(new MLPCreateNeuralNetwork { Neurons = 43, ActivationFunction = new TangensHyperbolikusFunktion(), OutputFunction = new LineareFunktion() });
+            //KNN.Add(new MLPCreateNeuralNetwork { Neurons = 1000, ActivationFunction = new ReLu(), OutputFunction = new LineareFunktion() });
+            //KNN.Add(new MLPCreateNeuralNetwork { Neurons = 100, ActivationFunction = new ReLu(), OutputFunction = new LineareFunktion() });
+            KNN.Add(new MLPCreateNeuralNetwork { Neurons = 43, ActivationFunction = new ReLu(), OutputFunction = new LineareFunktion() });
+            
+            /*
+            KNN.Add(new MLPCreateNeuralNetwork { Neurons = 2, ActivationFunction = new LineareFunktion(), OutputFunction = new LineareFunktion() });
+            KNN.Add(new MLPCreateNeuralNetwork { Neurons = 2, ActivationFunction = new SigmoideFunktion(), OutputFunction = new LineareFunktion() });
+            KNN.Add(new MLPCreateNeuralNetwork { Neurons = 1, ActivationFunction = new LineareFunktion(), OutputFunction = new LineareFunktion() });
+            */
             RBMLayerToCreate = new int[KNN.Count];
             for (int i = 0; i < KNN.Count; i++)
             {
@@ -54,9 +64,10 @@ namespace DeepBeliefNeuralNetwork
                 int contrastiveDivergence = 10000;
                 double MLPLearningRate = 0.1;
                 double MLPTolerance = 0.01;
-                int temp = 0;
+                int temp = 0, counter = 1;
 
-                Ordnerpfad = desktop + @"\" + OrdnerBachelorarbeit + @"\Berechnung\Mean0Variance2" + @"\" + @"CD" + contrastiveDivergence + @"\";
+                //Ordnerpfad = desktop + @"\" + OrdnerBachelorarbeit + @"\Berechnung\Mean0Variance2" + @"\" + @"CD" + contrastiveDivergence + @"\";
+                Ordnerpfad = desktop;
 
                 foreach (var item in KNN)
                 {
@@ -64,10 +75,12 @@ namespace DeepBeliefNeuralNetwork
                 }
                 double[,] weightmatrix = new double[temp, temp];
                 RBM2 = new RestrictedBoltzmannMachine2(RBMLayerToCreate, RND);
-                System.Threading.Tasks.Parallel.ForEach(trainigsSet, trainingCase =>
+                var myBag = new System.Collections.Concurrent.ConcurrentBag<PatternToLearn>(trainigsSet);
+                System.Threading.Tasks.Parallel.ForEach(myBag, new System.Threading.Tasks.ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, trainingCase =>
                 {
                     var inputVector = (double[])trainingCase.inputvector.Clone();
                     RBM2.GreedyTrainingRestrictedBoltzmannMachine(inputVector, contrastiveDivergence, RBMLearningRate, RND);
+                    Console.WriteLine(counter++ + "/" + myBag.Count);
                 });
                 /*
                 foreach (var trainingCase in trainigsSet)
@@ -85,7 +98,7 @@ namespace DeepBeliefNeuralNetwork
                 {
                     Networksize += Layer.Neurons + "_";
                 }
-
+                /*
                 System.IO.TextWriter file = new System.IO.StreamWriter(Ordnerpfad + Networksize + Time + "Genauigkeit" + ".csv", true);//, true
 
                 file.Write(KNN[0].ActivationFunction.ToString() + ";" + KNN[1].ActivationFunction.ToString() + ";" + KNN[2].ActivationFunction.ToString() + ";" + KNN[3].ActivationFunction.ToString());
@@ -95,12 +108,12 @@ namespace DeepBeliefNeuralNetwork
                 file.Write("Lernregel" + ";" + _lernregel + ";");
                 file.WriteLine();
                 file.Flush();
-
+                */
                 int schritte = TestNetz2.Training(10000, MLPLearningRate, MLPTolerance, trainigsSet, RBM2.Bias, testSet, _lernregel, Ordnerpfad);
                 double[] Vector = new double[trainigsSet[0].inputvector.Length];
                 double[] neu = new double[trainigsSet[0].targetvector.Length];
                 int numberOfCorrectClassification = 0;
-
+                /*
                 foreach (var patter in testSet)
                 {
                     double alle = 0;
@@ -219,6 +232,7 @@ namespace DeepBeliefNeuralNetwork
                     }
                 }
                 bild.SavePicture(Ordnerpfad + Networksize + Time + "Bild" + ".png");
+                */
                 //Vector = bildSet[0].inputvector;
                 //RBM2.GreedyTrainingRestrictedBoltzmannMachineWithPicture(Vector, RBMLearningRate, RND);
             }

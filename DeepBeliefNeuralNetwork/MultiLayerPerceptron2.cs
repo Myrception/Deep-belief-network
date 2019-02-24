@@ -1,13 +1,11 @@
-﻿using System;
+﻿using DeepBeliefNeuralNetwork.MLPComponents;
+using System;
 using System.Collections.Generic;
-using DeepBeliefNeuralNetwork.MLPComponents;
-using DeepBeliefNeuralNetwork.MLPComponents.Funktionen;
 
 namespace DeepBeliefNeuralNetwork
 {
-    class MultiLayerPerceptron2
+    internal class MultiLayerPerceptron2
     {
-        public decimal Fehler = 0,FehlerTest = 0;
         public List<List<MLPNeuron>> Layers = new List<List<MLPNeuron>>();
         public MLPWeightMatrix Matrix { get; set; }
         //private double[,] CloneMatrix;
@@ -20,7 +18,7 @@ namespace DeepBeliefNeuralNetwork
         /// mit Random werten belegt.
         /// </summary>
         /// <param name="networkToBeCreate">Enthält alle Parameter die zur erstellung des Neuronalen Netzes notwendig sind</param>
-        public MultiLayerPerceptron2(List<MLPCreateNeuralNetwork> networkToBeCreate,double[,]RBMMatrix, Random RND)
+        public MultiLayerPerceptron2(List<MLPCreateNeuralNetwork> networkToBeCreate, double[,] RBMMatrix, ThreadSafeRandom RND)
         {
             int index = 0, count = 0;
             foreach (MLPCreateNeuralNetwork item in networkToBeCreate)
@@ -34,7 +32,7 @@ namespace DeepBeliefNeuralNetwork
                 }
                 Layers.Add(temp);
             }
-            
+
             Matrix = new MLPWeightMatrix(count, count);
             MatrixRandom(networkToBeCreate, RND);
 
@@ -46,7 +44,7 @@ namespace DeepBeliefNeuralNetwork
                     {
                         Matrix[i, j] = RBMMatrix[i, j];
                     }
-                } 
+                }
             }
         }
 
@@ -66,25 +64,25 @@ namespace DeepBeliefNeuralNetwork
             }
             Matrix = new MLPWeightMatrix(count, count);
             Matrix = Matrix.Laden(matrixpfad, Matrix);
-            
         }
 
         #endregion Constructor
 
         #region Neuronal Network training
 
-            /// <summary>
-            /// In dieser Methode wird das Neuronale Netz trainiert.
-            /// </summary>
-            /// <param name="maxLearningSteps">Gibt an wieviele Lernschritte maximal gemacht werden sollen</param>
-            /// <param name="learningRate">Legt die Lernrate der Lernregel fest</param>
-            /// <param name="learningToleranz">Legt dei Toleranz mit der gelernt werden soll fest</param>
-            /// <param name="patternToLearn">Enthalten die Trainingsmuster</param>
-            /// <returns></returns>
-        public int Training(int maxLearningSteps, double learningRate, double learningToleranz, List<PatternToLearn> patternToLearn,List<RBMComponents.RBMBiasNeuron> RBMBias, List<PatternToLearn> patternToTest,string Lernregel,string Ordnerpfad)
+        /// <summary>
+        /// In dieser Methode wird das Neuronale Netz trainiert.
+        /// </summary>
+        /// <param name="maxLearningSteps">Gibt an wieviele Lernschritte maximal gemacht werden sollen</param>
+        /// <param name="learningRate">Legt die Lernrate der Lernregel fest</param>
+        /// <param name="learningToleranz">Legt dei Toleranz mit der gelernt werden soll fest</param>
+        /// <param name="patternToLearn">Enthalten die Trainingsmuster</param>
+        /// <returns></returns>
+        public int Training(int maxLearningSteps, double learningRate, double learningToleranz, List<PatternToLearn> patternToLearn, List<RBMComponents.RBMBiasNeuron> RBMBias, List<PatternToLearn> patternToTest, string Lernregel, string Ordnerpfad)
         {
+            decimal Fehler = 0, FehlerTest = 0;
             string Time = DateTime.Now.ToString("dd.MM.yy_HHmmss");
-            string Networksize="";
+            string Networksize = "";
             foreach (var Layer in Layers)
             {
                 Networksize += Layer.Count + "_";
@@ -96,6 +94,34 @@ namespace DeepBeliefNeuralNetwork
             {
                 Fehler = 0;
                 FehlerTest = 0;
+                int counter = 1;
+                var myBag = new System.Collections.Concurrent.ConcurrentBag<PatternToLearn>(patternToLearn);
+                System.Threading.Tasks.Parallel.ForEach(myBag, new System.Threading.Tasks.ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, muster =>
+                {
+                    if (Lernregel == "backprop")
+                    {
+                        if (TrainiereMuster(learningRate, learningToleranz, muster, RBMBias, Fehler))
+                        {
+                            trainingErfolgt = true;
+                        }
+                    }
+                    else if (Lernregel == "ERS")
+                    {
+                        if (TrainiereMusterERS(learningRate, learningToleranz, muster, RBMBias, Fehler))
+                        {
+                            trainingErfolgt = true;
+                        }
+                    }
+                    else if (Lernregel == "ERS2")
+                    {
+                        if (TrainiereMusterERS2(learningRate, learningToleranz, muster, RBMBias, Fehler))
+                        {
+                            trainingErfolgt = true;
+                        }
+                    }
+                    Console.WriteLine(counter++ + "/" + myBag.Count);
+                });
+                /*
                 foreach (var muster in patternToLearn)
                 {
                     if (Lernregel == "backprop")
@@ -120,6 +146,7 @@ namespace DeepBeliefNeuralNetwork
                         }
                     }
                 }
+                */
                 foreach (var patter in patternToTest)
                 {
                     double[] pruefung = new double[patter.targetvector.Length];
@@ -138,8 +165,8 @@ namespace DeepBeliefNeuralNetwork
                 file.WriteLine();
                 file.Flush();
 
-                Console.WriteLine("Trainingserror:"+" "+Fehler);
-                Console.WriteLine("Testerror:"+" "+FehlerTest);
+                Console.WriteLine("Trainingserror:" + " " + Fehler);
+                Console.WriteLine("Testerror:" + " " + FehlerTest);
                 if (trainingErfolgt)
                 {
                     Console.WriteLine(steps);
@@ -154,7 +181,6 @@ namespace DeepBeliefNeuralNetwork
 
                     Matrix.Speichern(Ordnerpfad + Networksize + Time + "Matrix.csv", Matrix);
                     return steps;
-
                 }
             }
             //Matrix.Speichern(@"C:\Users\Joseph\Desktop\Matrix.csv", Matrix);
@@ -168,7 +194,7 @@ namespace DeepBeliefNeuralNetwork
         /// <param name="lerntoleranz">Legt die Toleranz fest mit der gelernt wird</param>
         /// <param name="muster">Die Muster die gelernt werden sollen</param>
         /// <returns></returns>
-        private bool TrainiereMuster(double lernrate, double lerntoleranz, PatternToLearn muster, List<RBMComponents.RBMBiasNeuron> RBMBias)
+        private bool TrainiereMuster(double lernrate, double lerntoleranz, PatternToLearn muster, List<RBMComponents.RBMBiasNeuron> RBMBias, decimal Fehler)
         {
             bool nochmaltrainig = false;
             double[] pruefung = new double[muster.targetvector.Length];
@@ -209,7 +235,7 @@ namespace DeepBeliefNeuralNetwork
                         };
                         änderungen.Add(änderung);
                     }
-                        backDelta.Add(new MLPBackpropagationDelta() { Index = Layers[Layers.Count - 1][i].Index, Delta = outputDelta });
+                    backDelta.Add(new MLPBackpropagationDelta() { Index = Layers[Layers.Count - 1][i].Index, Delta = outputDelta });
                 }
             }
             for (int i = Layers.Count - 2; i > 0; i--)//Schicht der Schichten
@@ -239,7 +265,7 @@ namespace DeepBeliefNeuralNetwork
                         }
                     }
                     temp *= Layers[i][j - Layers[i][0].Index].ActivationFunction.BerechneAbleitung(Layers[i][j - Layers[i][0].Index].NetInput, 1d);
-                    
+
                     foreach (MLPNeuron neuronenOutput in Layers[i - 1])
                     {
                         var änderung = new MLPWeightChange
@@ -278,15 +304,16 @@ namespace DeepBeliefNeuralNetwork
         }
 
         #region ERS Training
+
         /// <summary>
-        /// Hier findet das eigentliche Training statt. Implementiert ist die ERS Lernregel. 
+        /// Hier findet das eigentliche Training statt. Implementiert ist die ERS Lernregel.
         /// </summary>
         /// <param name="lernrate">Legt die Lernrate fest</param>
         /// <param name="lerntoleranz">Legt die Toleranz fest mit der gelernt wird</param>
         /// <param name="muster">Die Muster die gelernt werden sollen</param>
         /// <param name="RBMBias">Liste der Bias Neuronen der RBMs</param>
         /// <returns></returns>
-        private bool TrainiereMusterERS(double lernrate, double lerntoleranz, PatternToLearn muster, List<RBMComponents.RBMBiasNeuron> RBMBias)
+        private bool TrainiereMusterERS(double lernrate, double lerntoleranz, PatternToLearn muster, List<RBMComponents.RBMBiasNeuron> RBMBias, decimal Fehler)
         {
             bool nochmaltrainig = false;
             double[] pruefung = new double[muster.targetvector.Length];
@@ -301,7 +328,6 @@ namespace DeepBeliefNeuralNetwork
 
                 if (double.IsNaN(pruefung[i]))
                 {
-
                 }
                 double outputDelta;
                 //if (Layers[Layers.Count - 1][i].ActivationFunction is Softmax)
@@ -331,7 +357,7 @@ namespace DeepBeliefNeuralNetwork
                         {
                             Zeile = neuronenOutput.Index,
                             Spalte = Layers[Layers.Count - 1][i].Index,
-                            Änderungswert = lernrate * Math.Abs(1-Math.Abs(Matrix[neuronenOutput.Index, Layers[Layers.Count - 1][i].Index])) * outputDelta * Math.Sign(neuronenOutput.Output)
+                            Änderungswert = lernrate * Math.Abs(1 - Math.Abs(Matrix[neuronenOutput.Index, Layers[Layers.Count - 1][i].Index])) * outputDelta * Math.Sign(neuronenOutput.Output)
                         };
                         änderungen.Add(änderung);
                     }
@@ -370,7 +396,6 @@ namespace DeepBeliefNeuralNetwork
                     //}
                     //else
                     //{
-
                     //    temp = temp * Layers[i][j - Layers[i][0].Index].ActivationFunction.BerechneAbleitung(Layers[i][j - Layers[i][0].Index].NetInput, 1d);
                     //}
                     foreach (MLPNeuron neuronenOutput in Layers[i - 1])
@@ -384,7 +409,6 @@ namespace DeepBeliefNeuralNetwork
                         änderungen.Add(änderung);
                         if (lernrate * Math.Abs(1 - Math.Abs(Matrix[neuronenOutput.Index, j])) * temp * Math.Sign(neuronenOutput.Output) > 100d)
                         {
-                            
                         }
                     }
                     backDelta.Add(new MLPBackpropagationDelta() { Index = j, Delta = temp });
@@ -424,23 +448,24 @@ namespace DeepBeliefNeuralNetwork
                     {
                         Matrix[item.Zeile, item.Spalte] += item.Änderungswert;
                     }
-
                 }
             }
             return nochmaltrainig;
         }
-        #endregion
+
+        #endregion ERS Training
 
         #region ERS 2 Training
+
         /// <summary>
-        /// Hier findet das eigentliche Training statt. Implementiert ist die ERS2 Lernregel. 
+        /// Hier findet das eigentliche Training statt. Implementiert ist die ERS2 Lernregel.
         /// </summary>
         /// <param name="lernrate">Legt die Lernrate fest</param>
         /// <param name="lerntoleranz">Legt die Toleranz fest mit der gelernt wird</param>
         /// <param name="muster">Die Muster die gelernt werden sollen</param>
         /// <param name="RBMBias">Liste der Bias Neuronen der RBMs</param>
         /// <returns></returns>
-        private bool TrainiereMusterERS2(double lernrate, double lerntoleranz, PatternToLearn muster, List<RBMComponents.RBMBiasNeuron> RBMBias)
+        private bool TrainiereMusterERS2(double lernrate, double lerntoleranz, PatternToLearn muster, List<RBMComponents.RBMBiasNeuron> RBMBias, decimal Fehler)
         {
             bool nochmaltrainig = false;
             double[] pruefung = new double[muster.targetvector.Length];
@@ -455,7 +480,6 @@ namespace DeepBeliefNeuralNetwork
 
                 if (double.IsNaN(pruefung[i]))
                 {
-
                 }
                 double outputDelta;
                 //if (Layers[Layers.Count - 1][i].ActivationFunction is Softmax)
@@ -490,7 +514,6 @@ namespace DeepBeliefNeuralNetwork
                         änderungen.Add(änderung);
                         if (lernrate * Math.Abs(1 - Math.Abs(Matrix[neuronenOutput.Index, Layers[Layers.Count - 1][i].Index])) * outputDelta * neuronenOutput.Output > 100d)
                         {
-
                         }
                     }
                     backDelta.Add(new MLPBackpropagationDelta() { Index = Layers[Layers.Count - 1][i].Index, Delta = outputDelta });
@@ -528,7 +551,6 @@ namespace DeepBeliefNeuralNetwork
                     //}
                     //else
                     //{
-
                     //    temp = temp * Layers[i][j - Layers[i][0].Index].ActivationFunction.BerechneAbleitung(Layers[i][j - Layers[i][0].Index].NetInput, 1d);
                     //}
                     foreach (MLPNeuron neuronenOutput in Layers[i - 1])
@@ -542,7 +564,6 @@ namespace DeepBeliefNeuralNetwork
                         änderungen.Add(änderung);
                         if (lernrate * Math.Abs(1 - Math.Abs(Matrix[neuronenOutput.Index, j])) * temp * neuronenOutput.Output > 100d)
                         {
-
                         }
                     }
                     backDelta.Add(new MLPBackpropagationDelta() { Index = j, Delta = temp });
@@ -574,22 +595,20 @@ namespace DeepBeliefNeuralNetwork
             }
             if (nochmaltrainig == false)
             {
-
             }
             return nochmaltrainig;
         }
-        #endregion
 
-       
+        #endregion ERS 2 Training
 
         #endregion Neuronal Network training
 
-        private void MatrixRandom(List<MLPCreateNeuralNetwork> networkToBeCreate, Random rnd)
+        private void MatrixRandom(List<MLPCreateNeuralNetwork> networkToBeCreate, ThreadSafeRandom rnd)
         {
             for (int i = 0; i < Layers.Count - 1; i++)
             {
-                XavierInitialization Xavier = new XavierInitialization(networkToBeCreate[i].Neurons,
-                    networkToBeCreate[i + 1].Neurons, networkToBeCreate[i + 1].ActivationFunction);
+                //XavierInitialization Xavier = new XavierInitialization(networkToBeCreate[i].Neurons,
+                //    networkToBeCreate[i + 1].Neurons, networkToBeCreate[i + 1].ActivationFunction);
                 foreach (MLPNeuron layerN in Layers[i])
                 {
                     foreach (MLPNeuron layerNPlusOne in Layers[i + 1])

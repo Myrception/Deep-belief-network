@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DeepBeliefNeuralNetwork.MLPComponents
+﻿namespace DeepBeliefNeuralNetwork.MLPComponents
 {
     public class MLPNeuron
     {
@@ -39,10 +33,8 @@ namespace DeepBeliefNeuralNetwork.MLPComponents
             get { return _Output; }
             set { _Output = value; }
         }
-        
 
         public IFunktionen ActivationFunction { get; set; }
         public IFunktionen OutputFunction { get; set; }
-
     }
 }

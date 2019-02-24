@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DeepBeliefNeuralNetwork.RBMComponents
+﻿namespace DeepBeliefNeuralNetwork.RBMComponents
 {
-   internal class RBMBiasNeuron
+    internal class RBMBiasNeuron
     {
         private double _BiasHidden;
 
@@ -15,6 +9,7 @@ namespace DeepBeliefNeuralNetwork.RBMComponents
             get { return _BiasHidden; }
             set { _BiasHidden = value; }
         }
+
         private double _BiasVisible;
 
         public double BiasVisible
@@ -22,11 +17,11 @@ namespace DeepBeliefNeuralNetwork.RBMComponents
             get { return _BiasVisible; }
             set { _BiasVisible = value; }
         }
+
         public RBMBiasNeuron()
         {
             BiasHidden = 0d;
             BiasVisible = 0d;
         }
-
     }
 }

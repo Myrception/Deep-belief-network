@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DeepBeliefNeuralNetwork.MLPComponents
+﻿namespace DeepBeliefNeuralNetwork.MLPComponents
 {
     internal class MLPWeightMatrix
     {
@@ -43,16 +37,16 @@ namespace DeepBeliefNeuralNetwork.MLPComponents
         {
             int counter = 0;
             var reader = new System.IO.StreamReader(SpeicherortSowieDateiname);
-                while (!reader.EndOfStream)  
-                {
+            while (!reader.EndOfStream)
+            {
                 string read = reader.ReadLine();
                 string[] readsplitted = read.Split(";".ToCharArray());
-                for (int i = 0; i < readsplitted.Length-1; i++)
+                for (int i = 0; i < readsplitted.Length - 1; i++)
                 {
-                matrix[counter,i] = double.Parse(readsplitted[i]);
+                    matrix[counter, i] = double.Parse(readsplitted[i]);
                 }
-                counter++; 
-                }
+                counter++;
+            }
             return matrix;
         }
 
