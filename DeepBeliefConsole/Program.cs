@@ -19,8 +19,7 @@ namespace DeepBeliefConsole
             //string Variance = Testpfad.Split(@"\\".ToCharArray())[Testpfad.Split(@"\\".ToCharArray()).Length - 1];
 
             var test = new TraficSignPictures_Import();
-            var liste = test.Import(Trainingspfad,Testpfad);
-
+            var liste = test.Import(Trainingspfad, Testpfad);
             #region csv Import
 
             //string fileName = @"C:\Users\Joseph\Desktop\TrainingsMuster50.csv"; // Muss angepasst werden
@@ -161,7 +160,7 @@ namespace DeepBeliefConsole
             for (int i = 0; i < 1; i++)
             {
                 DeepBeliefNetwork DBNN = new DeepBeliefNetwork("backprop");
-                DBNN.GreedyLayerWiseTraining(liste[0], liste[1], null, null);
+                DBNN.GreedyLayerWiseTraining(liste, null, null);
                 //DBNN.GreedyLayerWiseTraining(XORpattertolearn, XORpattertotest, null, null);
             }
 

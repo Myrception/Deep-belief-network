@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -8,11 +9,11 @@ namespace DeepBeliefNeuralNetwork
 {
     public class TraficSignPictures_Import
     {
-        public List<List<PatternToLearn>> Import(string Trainingspfad, string Testpfad)
+        public ConcurrentBag<ConcurrentBag<PatternToLearn>> Import(string Trainingspfad, string Testpfad)
         {
-            List<List<PatternToLearn>> returnList = new List<List<PatternToLearn>>();
-            List<PatternToLearn> pattertolearn = new List<PatternToLearn>();
-            List<PatternToLearn> pattertotest = new List<PatternToLearn>();
+            var returnList = new ConcurrentBag<ConcurrentBag<PatternToLearn>>(); //new List<List<PatternToLearn>>();
+            var pattertolearn = new ConcurrentBag<PatternToLearn>();
+            var pattertotest = new ConcurrentBag<PatternToLearn>();
 
             var bilder = new BildLaden();
             System.Threading.Tasks.Parallel.ForEach(Directory.EnumerateDirectories(Trainingspfad), directories =>
@@ -52,23 +53,23 @@ namespace DeepBeliefNeuralNetwork
             }
             );
 
-            StreamReader reader = new StreamReader(Testpfad + @"\" + @"GT-final_test.csv");
-            string line;
-            string[] splitted;
-            char[] separator = ";".ToCharArray();
             List<string[]> compareList = new List<string[]>();
-
-            while (!reader.EndOfStream)
+            using (StreamReader reader = new StreamReader(Testpfad + @"\" + @"GT-final_test.csv"))
             {
-                string[] compareString = new string[2];
-                line = reader.ReadLine();
-                splitted = line.Split(separator);
-                compareString[0] = splitted[0].Split(".".ToCharArray())[0];
-                compareString[1] = splitted[splitted.Count() - 1];
-                compareList.Add(compareString);
+                string line;
+                string[] splitted;
+                char[] separator = ";".ToCharArray();
+
+                while (!reader.EndOfStream)
+                {
+                    string[] compareString = new string[2];
+                    line = reader.ReadLine();
+                    splitted = line.Split(separator);
+                    compareString[0] = splitted[0].Split(".".ToCharArray())[0];
+                    compareString[1] = splitted[splitted.Count() - 1];
+                    compareList.Add(compareString);
+                }
             }
-            reader.Dispose();
-            reader.Close();
 
             System.Threading.Tasks.Parallel.ForEach(Directory.EnumerateFiles(Testpfad, "*.jpg"), file =>
             {

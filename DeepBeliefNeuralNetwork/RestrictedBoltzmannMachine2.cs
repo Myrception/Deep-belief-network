@@ -272,8 +272,8 @@ namespace DeepBeliefNeuralNetwork
         {
             Bilderstellen bild;
             int temp = 0, temp2 = 0, temp3 = 0, temp4 = Layers[0].Count;
-            int _weightTemp1 = 0;
-            int _weightTemp2 = 0;
+            //int _weightTemp1 = 0;
+            //int _weightTemp2 = 0;
             double[] _initialBinaryHiddenList = new double[0];
             for (int i = 0; i < inputvector.Length; i++)
             {

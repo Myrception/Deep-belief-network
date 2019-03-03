@@ -2,6 +2,7 @@
 using DeepBeliefNeuralNetwork.MLPComponents.Funktionen;
 using DeepBeliefNeuralNetwork.RBMComponents;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace DeepBeliefNeuralNetwork
@@ -36,12 +37,11 @@ namespace DeepBeliefNeuralNetwork
             //KNN.Add(new MLPCreateNeuralNetwork { Neurons = 1000, ActivationFunction = new ReLu(), OutputFunction = new LineareFunktion() });
             //KNN.Add(new MLPCreateNeuralNetwork { Neurons = 100, ActivationFunction = new ReLu(), OutputFunction = new LineareFunktion() });
             KNN.Add(new MLPCreateNeuralNetwork { Neurons = 43, ActivationFunction = new ReLu(), OutputFunction = new LineareFunktion() });
-            
-            /*
-            KNN.Add(new MLPCreateNeuralNetwork { Neurons = 2, ActivationFunction = new LineareFunktion(), OutputFunction = new LineareFunktion() });
-            KNN.Add(new MLPCreateNeuralNetwork { Neurons = 2, ActivationFunction = new SigmoideFunktion(), OutputFunction = new LineareFunktion() });
-            KNN.Add(new MLPCreateNeuralNetwork { Neurons = 1, ActivationFunction = new LineareFunktion(), OutputFunction = new LineareFunktion() });
-            */
+
+            //KNN.Add(new MLPCreateNeuralNetwork { Neurons = 2, ActivationFunction = new LineareFunktion(), OutputFunction = new LineareFunktion() });
+            //KNN.Add(new MLPCreateNeuralNetwork { Neurons = 2, ActivationFunction = new SigmoideFunktion(), OutputFunction = new LineareFunktion() });
+            //KNN.Add(new MLPCreateNeuralNetwork { Neurons = 1, ActivationFunction = new LineareFunktion(), OutputFunction = new LineareFunktion() });
+
             RBMLayerToCreate = new int[KNN.Count];
             for (int i = 0; i < KNN.Count; i++)
             {
@@ -49,8 +49,14 @@ namespace DeepBeliefNeuralNetwork
             }
         }
 
-        public void GreedyLayerWiseTraining(List<PatternToLearn> trainigsSet, List<PatternToLearn> testSet, List<PatternToLearn> bildSet, string Variance)
+        public void GreedyLayerWiseTraining(ConcurrentBag<ConcurrentBag<PatternToLearn>> Sets, List<PatternToLearn> bildSet, string Variance)
         {
+            ConcurrentBag<PatternToLearn> trainigsSet;
+            ConcurrentBag<PatternToLearn> testSet;
+
+            Sets.TryTake(out testSet);
+            Sets.TryTake(out trainigsSet);
+
             string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             string OrdnerBachelorarbeit = "BachelorarbeitJoseph";
             string Ordnerpfad = desktop + @"\" + OrdnerBachelorarbeit + @"\Berechnung" + "BerechnungVariante2ERS" + @"\";
@@ -110,9 +116,9 @@ namespace DeepBeliefNeuralNetwork
                 file.Flush();
                 */
                 int schritte = TestNetz2.Training(10000, MLPLearningRate, MLPTolerance, trainigsSet, RBM2.Bias, testSet, _lernregel, Ordnerpfad);
-                double[] Vector = new double[trainigsSet[0].inputvector.Length];
-                double[] neu = new double[trainigsSet[0].targetvector.Length];
-                int numberOfCorrectClassification = 0;
+                //double[] Vector = new double[trainigsSet[0].inputvector.Length];
+                //double[] neu = new double[trainigsSet[0].targetvector.Length];
+                //int numberOfCorrectClassification = 0;
                 /*
                 foreach (var patter in testSet)
                 {
@@ -314,7 +320,7 @@ namespace DeepBeliefNeuralNetwork
                     file.Flush();
                 }
                 int schritte = TestNetz.Training(100000, MLPLearningRate, MLPTolerance, trainigsSet, testSet, RBMLayer, RND);
-
+/*
                 double[] Vector = new double[trainigsSet[0].inputvector.Length];
                 double[] neu = new double[trainigsSet[0].targetvector.Length];
                 int numberOfCorrectClassification = 0;
@@ -493,6 +499,7 @@ namespace DeepBeliefNeuralNetwork
                     }
                 }
                 bild.SavePicture(@"C:\Users\Joseph\Desktop\" + Networksize + Time + "Bild" + ".png");
+                */
             }
 
             #endregion DBNN
@@ -529,6 +536,7 @@ namespace DeepBeliefNeuralNetwork
                 int schritte = TestNetz2.Training(100000, MLPLearningRate, MLPTolerance, trainigsSet, RBM2.Bias, testSet, lernregel, Ordnerpfad);
                 //Console.WriteLine("Notwendige Trainingsschritte:" + " " + schritte);
                 //Console.WriteLine("Notwendige Trainingsschritte:" + " " + schritte);
+                /*
                 double[] Vector = new double[trainigsSet[0].inputvector.Length];
                 double[] neu = new double[trainigsSet[0].targetvector.Length];
                 int numberOfCorrectClassification = 0;
@@ -651,6 +659,7 @@ namespace DeepBeliefNeuralNetwork
                     }
                 }
                 bild.SavePicture(Ordnerpfad + Networksize + Time + "Bild" + ".png");
+                */
             }
 
             #endregion MLP

@@ -35,7 +35,7 @@ namespace DeepBeliefNeuralNetwork
         public void ErstellenErgebniss(string Matrixpfad, List<PatternToLearn> testSet, List<PatternToLearn> bildSet, string speicherpfad)
         {
             //string lernregel = "ERS"; //Eingabe ERS,ERS2 oder backprop
-            double RBMLearningRate = 0.1;
+            //double RBMLearningRate = 0.1;
             //int contrastiveDivergence = 100;
             //double MLPLearningRate = 0.1;
             //double MLPTolerance = 0.01;

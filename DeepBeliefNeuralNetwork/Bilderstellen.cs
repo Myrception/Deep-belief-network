@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Drawing.Imaging;
 
 namespace DeepBeliefNeuralNetwork
@@ -6,7 +7,7 @@ namespace DeepBeliefNeuralNetwork
     /// <summary>
     /// Methode zur Erstellung eines Bildes
     /// </summary>
-    public class Bilderstellen
+    public class Bilderstellen : IDisposable
     {
         private Bitmap bmp;
 
@@ -29,6 +30,22 @@ namespace DeepBeliefNeuralNetwork
         public void BildPixelPlazieren(int x, int y, Color color)
         {
             bmp.SetPixel(x, y, color);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // dispose managed resources
+                bmp.Dispose();
+            }
+            // free native resources
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>

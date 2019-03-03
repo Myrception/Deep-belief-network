@@ -1,6 +1,8 @@
 ﻿using DeepBeliefNeuralNetwork.MLPComponents;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DeepBeliefNeuralNetwork
 {
@@ -78,29 +80,28 @@ namespace DeepBeliefNeuralNetwork
         /// <param name="learningToleranz">Legt dei Toleranz mit der gelernt werden soll fest</param>
         /// <param name="patternToLearn">Enthalten die Trainingsmuster</param>
         /// <returns></returns>
-        public int Training(int maxLearningSteps, double learningRate, double learningToleranz, List<PatternToLearn> patternToLearn, List<RBMComponents.RBMBiasNeuron> RBMBias, List<PatternToLearn> patternToTest, string Lernregel, string Ordnerpfad)
+        public int Training(int maxLearningSteps, double learningRate, double learningToleranz, ConcurrentBag<PatternToLearn> patternToLearn, List<RBMComponents.RBMBiasNeuron> RBMBias, ConcurrentBag<PatternToLearn> patternToTest, string Lernregel, string Ordnerpfad)
         {
-            decimal Fehler = 0, FehlerTest = 0;
+            int processorCount = Environment.ProcessorCount;
             string Time = DateTime.Now.ToString("dd.MM.yy_HHmmss");
             string Networksize = "";
             foreach (var Layer in Layers)
             {
                 Networksize += Layer.Count + "_";
             }
-            System.IO.TextWriter file = new System.IO.StreamWriter(Ordnerpfad + Networksize + Time + ".csv", true);//, true
+            //System.IO.TextWriter file = new System.IO.StreamWriter(Ordnerpfad + Networksize + Time + ".csv", true);//, true
             bool trainingErfolgt = false;
             int steps = 0;
             while (steps < maxLearningSteps)
             {
-                Fehler = 0;
-                FehlerTest = 0;
-                int counter = 1;
+                decimal Fehler = 0, FehlerTest = 0;
+                //int counter = 1;
                 var myBag = new System.Collections.Concurrent.ConcurrentBag<PatternToLearn>(patternToLearn);
-                System.Threading.Tasks.Parallel.ForEach(myBag, new System.Threading.Tasks.ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, muster =>
+                System.Threading.Tasks.Parallel.ForEach(myBag, new System.Threading.Tasks.ParallelOptions { MaxDegreeOfParallelism = processorCount }, muster =>
                 {
                     if (Lernregel == "backprop")
                     {
-                        if (TrainiereMuster(learningRate, learningToleranz, muster, RBMBias, Fehler))
+                        if (TrainiereMuster(learningRate, learningToleranz, muster, RBMBias, ref Fehler))
                         {
                             trainingErfolgt = true;
                         }
@@ -119,7 +120,7 @@ namespace DeepBeliefNeuralNetwork
                             trainingErfolgt = true;
                         }
                     }
-                    Console.WriteLine(counter++ + "/" + myBag.Count);
+                    //Console.WriteLine(counter++ + "/" + myBag.Count);
                 });
                 /*
                 foreach (var muster in patternToLearn)
@@ -147,7 +148,24 @@ namespace DeepBeliefNeuralNetwork
                     }
                 }
                 */
-                foreach (var patter in patternToTest)
+
+                var bagPatternToLearn = new System.Collections.Concurrent.ConcurrentBag<PatternToLearn>(patternToLearn);
+                System.Threading.Tasks.Parallel.ForEach(bagPatternToLearn, new System.Threading.Tasks.ParallelOptions { MaxDegreeOfParallelism = processorCount }, patter =>
+                {
+                    double[] pruefung = new double[patter.targetvector.Length];
+                    double[] ausgabevektor = new double[patter.targetvector.Length];
+                    ausgabevektor = patter.inputvector.CalculateTargetWithBias(Layers, Matrix, RBMBias, 1d);
+                    for (int i = 0; i < patter.targetvector.Length; i++)
+                    {
+                        pruefung[i] = (patter.targetvector[i] - ausgabevektor[i]);
+                    }
+                    foreach (double t in pruefung)
+                    {
+                        FehlerTest += (decimal)Math.Abs(t);
+                    }
+                });
+
+                /*foreach (var patter in patternToTest)
                 {
                     double[] pruefung = new double[patter.targetvector.Length];
                     double[] ausgabevektor = new double[patter.targetvector.Length];
@@ -161,9 +179,10 @@ namespace DeepBeliefNeuralNetwork
                         FehlerTest += (decimal)Math.Abs(t);
                     }
                 }
-                file.Write(steps + ";" + Fehler.ToString() + ";" + FehlerTest.ToString() + ";");
-                file.WriteLine();
-                file.Flush();
+                */
+                //file.Write(steps + ";" + Fehler.ToString() + ";" + FehlerTest.ToString() + ";");
+                //file.WriteLine();
+                //file.Flush();
 
                 Console.WriteLine("Trainingserror:" + " " + Fehler);
                 Console.WriteLine("Testerror:" + " " + FehlerTest);
@@ -177,9 +196,9 @@ namespace DeepBeliefNeuralNetwork
                 {
                     Console.WriteLine(Fehler);
 
-                    file.Close();
+                    //file.Close();
 
-                    Matrix.Speichern(Ordnerpfad + Networksize + Time + "Matrix.csv", Matrix);
+                    //Matrix.Speichern(Ordnerpfad + Networksize + Time + "Matrix.csv", Matrix);
                     return steps;
                 }
             }
@@ -194,28 +213,17 @@ namespace DeepBeliefNeuralNetwork
         /// <param name="lerntoleranz">Legt die Toleranz fest mit der gelernt wird</param>
         /// <param name="muster">Die Muster die gelernt werden sollen</param>
         /// <returns></returns>
-        private bool TrainiereMuster(double lernrate, double lerntoleranz, PatternToLearn muster, List<RBMComponents.RBMBiasNeuron> RBMBias, decimal Fehler)
+        private bool TrainiereMuster(double lernrate, double lerntoleranz, PatternToLearn muster, List<RBMComponents.RBMBiasNeuron> RBMBias, ref decimal Fehler)
         {
             bool nochmaltrainig = false;
-            double[] pruefung = new double[muster.targetvector.Length];
-            var ausgabevektor = muster.inputvector.CalculateTargetWithBias(Layers, Matrix, RBMBias, 1d);
+            double temp;
+            //double[] pruefung = new double[muster.targetvector.Length];
+            double[] ausgabevektor = muster.inputvector.CalculateTargetWithBias(Layers, Matrix, RBMBias, 1d);
             List<MLPBackpropagationDelta> backDelta = new List<MLPBackpropagationDelta>();
             List<MLPWeightChange> änderungen = new List<MLPWeightChange>();
+            var pruefung = muster.targetvector.Zip(ausgabevektor, (d1, d2) => Math.Abs(d1 - d2)).ToArray();
             for (int i = 0; i < Layers[Layers.Count - 1].Count; i++)
             {
-                pruefung[i] = muster.targetvector[i] - ausgabevektor[i];// Kosten Funktion
-                //pruefung[i] = -(muster.targetvector[i]) * Math.Log(ausgabevektor[i]); // Kosten Funktion für Softmax
-
-                //if (Layers[Layers.Count - 1][i].ActivationFunction is Softmax)
-                //{
-                //    outputDelta = Layers[Layers.Count - 1][i].ActivationFunction.BerechneAbleitung(Layers[Layers.Count - 1][i].NetInput, 1d, Layers)
-                //      * (muster.targetvector[i] - Layers[Layers.Count - 1][i].Output);
-                //    if (double.IsNaN(outputDelta) || double.IsInfinity(outputDelta))
-                //    {
-                //        nochmaltrainig = false;
-                //    }
-                //}
-
                 double outputDelta = Layers[Layers.Count - 1][i].ActivationFunction.BerechneAbleitung(Layers[Layers.Count - 1][i].NetInput, 1d)
                                      * (muster.targetvector[i] - Layers[Layers.Count - 1][i].Output);
 
@@ -242,7 +250,7 @@ namespace DeepBeliefNeuralNetwork
             {
                 for (int j = Layers[i][Layers[i].Count - 1].Index; j >= Layers[i][0].Index; j--)//Auf Neuronen Ebene
                 {
-                    double temp = 0;
+                    temp = 0;
                     foreach (MLPNeuron item in Layers[i + 1])
                     {
                         foreach (MLPBackpropagationDelta item2 in backDelta)
@@ -282,7 +290,7 @@ namespace DeepBeliefNeuralNetwork
 
             foreach (double t in pruefung)
             {
-                double toleranz = lerntoleranz - Math.Abs(t);
+                double toleranz = lerntoleranz - t;
                 if (toleranz < 0)
                 {
                     nochmaltrainig = true;
